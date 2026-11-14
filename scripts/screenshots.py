@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+"""Capture des écrans de Quest3Replika dans un émulateur Android (utilisé par le workflow screenshots)."""
+import os
+import re
+import subprocess
+import sys
+import time
+import xml.etree.ElementTree as ET
+
+PKG = "com.tiboard.quest3replika"
+OUT = sys.argv[2] if len(sys.argv) > 2 else "docs/screenshots"
+APK = sys.argv[1]
+
+
+def adb(*args, check=True):
+    print("+ adb", " ".join(args), flush=True)
+    return subprocess.run(["adb", *args], check=check, capture_output=True, text=True).stdout
+
+
+def shell(cmd):
+    return adb("shell", cmd, check=False)
+
+
+def cap(name):
+    os.makedirs(OUT, exist_ok=True)
+    with open(os.path.join(OUT, name), "wb") as f:
+        f.write(subprocess.run(["adb", "exec-out", "screencap", "-p"], check=True, capture_output=True).stdout)
+    print("capture", name, flush=True)
+
+
+def nodes():
+    shell("uiautomator dump /sdcard/ui.xml")
+    xml = adb("exec-out", "cat", "/sdcard/ui.xml")
+    return ET.fromstring(xml).iter("node")
+
+
+def tap(pred, label, retries=5):
+    for _ in range(retries):
+        for n in nodes():
+            if pred(n):
+                x1, y1, x2, y2 = map(int, re.findall(r"\d+", n.get("bounds")))
+                shell(f"input tap {(x1 + x2) // 2} {(y1 + y2) // 2}")
+                print("tap", label, flush=True)
+                return True
+        time.sleep(1.5)
+    print("introuvable :", label, flush=True)
+    return False
+
+
+def tap_text(t):
+    return tap(lambda n: n.get("text", "") == t, t)
+
+
+def tap_id(rid):
+    return tap(lambda n: n.get("resource-id", "") == rid, rid)
+
+
+for k in ("window_animation_scale", "transition_animation_scale", "animator_duration_scale"):
+    shell(f"settings put global {k} 0")
+shell("settings put system screen_off_timeout 1800000")
+shell("svc power stayon true")
+shell("input keyevent KEYCODE_WAKEUP")
+shell("wm dismiss-keyguard")
+adb("install", "-r", "-g", APK)
+
+# 1. Mode Émetteur
+shell(f"am start -W -n {PKG}/.MainActivity")
+time.sleep(4)
+tap_text("Émetteur (Meta Quest 3)")
+time.sleep(1.5)
+cap("01-emetteur.png")
+
+# 2. Démarrage de la diffusion (fenêtre de consentement MediaProjection)
+tap_text("Démarrer la diffusion")
+time.sleep(3)
+cap("02-consentement.png")
+tap_id("android:id/button1")
+time.sleep(5)
+cap("03-diffusion.png")
+
+# 3. Notification du service au premier plan
+shell("cmd statusbar expand-notifications")
+time.sleep(2.5)
+cap("04-notification.png")
+shell("cmd statusbar collapse")
+time.sleep(1.5)
+
+# 4. Mode Récepteur : découverte NSD (l'émetteur tourne sur le même appareil)
+tap_text("Récepteur (tablette)")
+time.sleep(8)
+cap("05-recepteur.png")
+
+# 5. Flux reçu (connexion automatique ou manuelle sur 127.0.0.1)
+out = shell("dumpsys activity activities | grep -i ReceiverActivity | head -1")
+if "ReceiverActivity" not in out:
+    tap(lambda n: n.get("resource-id", "").endswith(":id/manualIp"), "champ IP")
+    shell("input text 127.0.0.1")
+    shell("input keyevent KEYCODE_BACK")
+    time.sleep(1)
+    tap_text("Connexion manuelle")
+time.sleep(8)
+cap("06-flux.png")
+print(shell(f"logcat -d -s StreamReceiver VideoDecoder StreamSender VideoEncoder ScreenCapturer CaptureService | tail -40"))
