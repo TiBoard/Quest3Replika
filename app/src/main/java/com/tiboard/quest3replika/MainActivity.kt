@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
 import android.os.Bundle
+import android.provider.Settings
+import android.view.ContextThemeWrapper
 import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
@@ -18,6 +20,7 @@ import android.widget.Toast
 import com.tiboard.quest3replika.common.Permissions
 import com.tiboard.quest3replika.common.Prefs
 import com.tiboard.quest3replika.common.Protocol
+import com.tiboard.quest3replika.discovery.BeaconListener
 import com.tiboard.quest3replika.discovery.NsdScanner
 import com.tiboard.quest3replika.receiver.ReceiverActivity
 import com.tiboard.quest3replika.sender.CaptureService
@@ -36,6 +39,9 @@ class MainActivity : Activity() {
     private lateinit var receiverStatus: TextView
     private lateinit var senderList: LinearLayout
     private var scanner: NsdScanner? = null
+    private var beaconListener: BeaconListener? = null
+    private var nsdSenders: List<NsdScanner.Sender> = emptyList()
+    private val beaconSenders = LinkedHashMap<String, NsdScanner.Sender>()
     private var autoLaunched = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,7 +65,27 @@ class MainActivity : Activity() {
 
         setupSenderControls()
         setupReceiverControls()
-        Permissions.requestMissing(this)
+        // Aucune demande de permission ici : le casque ne doit afficher aucune fenêtre superflue.
+        // (Les notifications restent muettes tant que POST_NOTIFICATIONS n'est pas accordée.)
+        handleLaunchIntent(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleLaunchIntent(intent)
+    }
+
+    /**
+     * `adb shell am start -n com.tiboard.quest3replika/.MainActivity --ez autostart true`
+     * lance la diffusion immédiatement, sans toucher à l'interface du casque.
+     */
+    private fun handleLaunchIntent(i: Intent?) {
+        if (i?.getBooleanExtra(EXTRA_AUTOSTART, false) == true && !CaptureService.isRunning) {
+            prefs.mode = Prefs.MODE_SENDER
+            findViewById<RadioGroup>(R.id.modeGroup).check(R.id.modeSender)
+            requestProjection()
+        }
     }
 
     override fun onResume() {
@@ -149,6 +175,8 @@ class MainActivity : Activity() {
         if (resultCode == RESULT_OK && data != null) {
             CaptureService.start(this, resultCode, data)
             senderStatus.text = "Démarrage…"
+            // Mode discret : l'application disparaît du casque, le joueur ne voit que son jeu ou sa vidéo.
+            finishAndRemoveTask()
         } else {
             Toast.makeText(this, R.string.projection_denied, Toast.LENGTH_LONG).show()
         }
@@ -169,6 +197,13 @@ class MainActivity : Activity() {
 
         val ip = findViewById<EditText>(R.id.manualIp)
         ip.setText(prefs.lastManualIp)
+        findViewById<Button>(R.id.openHotspot).setOnClickListener {
+            try {
+                startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS))
+            } catch (e: Exception) {
+                startActivity(Intent(Settings.ACTION_SETTINGS))
+            }
+        }
         findViewById<Button>(R.id.manualConnect).setOnClickListener {
             val raw = ip.text.toString().trim()
             if (raw.isEmpty()) return@setOnClickListener
@@ -182,21 +217,44 @@ class MainActivity : Activity() {
     private fun startScanning() {
         if (scanner != null) return
         receiverStatus.setText(R.string.receiver_searching)
-        scanner = NsdScanner(this) { list -> renderSenders(list) }.also { it.start() }
+        updateDirectInfo()
+        scanner = NsdScanner(this) { list -> nsdSenders = list; refreshSenders() }.also { it.start() }
+        beaconListener = BeaconListener(this) { s ->
+            runOnUiThread { beaconSenders[s.host] = s; refreshSenders() }
+        }.also { it.start() }
     }
 
     private fun stopScanning() {
         scanner?.stop()
         scanner = null
+        beaconListener?.stop()
+        beaconListener = null
+    }
+
+    /** Fusionne les émetteurs trouvés par mDNS et par balise (même casque = même adresse). */
+    private fun refreshSenders() {
+        val hosts = nsdSenders.map { it.host }.toSet()
+        renderSenders(nsdSenders + beaconSenders.values.filter { it.host !in hosts })
+    }
+
+    private fun updateDirectInfo() {
+        val ips = Permissions.localIpv4Addresses()
+        findViewById<TextView>(R.id.directIp).text =
+            if (ips.isEmpty()) getString(R.string.direct_no_ip) else getString(R.string.direct_ip, ips.joinToString(", "))
     }
 
     private fun renderSenders(list: List<NsdScanner.Sender>) {
         senderList.removeAllViews()
         receiverStatus.setText(if (list.isEmpty()) R.string.receiver_searching else R.string.receiver_found)
         for (s in list) {
-            val b = Button(this)
+            val b = Button(ContextThemeWrapper(this, R.style.GhostButton), null, 0)
+            b.setBackgroundResource(R.drawable.btn_ghost)
+            b.setTextColor(getColor(R.color.text_primary))
             b.text = "${s.name}\n${s.host}:${s.port}"
             b.isAllCaps = false
+            b.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = (10 * resources.displayMetrics.density).toInt() }
             b.setOnClickListener { openReceiver(s.name, s.host, s.port) }
             senderList.addView(b)
         }
@@ -217,14 +275,8 @@ class MainActivity : Activity() {
         )
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == Permissions.REQUEST_CODE && grantResults.any { it != android.content.pm.PackageManager.PERMISSION_GRANTED }) {
-            Toast.makeText(this, R.string.perm_denied, Toast.LENGTH_LONG).show()
-        }
-    }
-
     companion object {
         private const val REQ_PROJECTION = 2001
+        const val EXTRA_AUTOSTART = "autostart"
     }
 }

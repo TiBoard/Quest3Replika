@@ -2,147 +2,181 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:overScrollMode="never">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:paddingBottom="32dp"
+        android:paddingEnd="24dp"
+        android:paddingStart="24dp"
+        android:paddingTop="20dp">
+
+        <!-- En-tête : titre à gauche, logo RB dans le coin -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="76dp"
+                android:layout_height="76dp"
+                android:layout_marginEnd="14dp"
+                android:contentDescription="@string/logo_desc"
+                android:scaleType="fitCenter"
+                android:src="@drawable/logo_qr" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/app_name"
+                    android:textColor="@color/text_primary"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/tagline"
+                    android:textColor="@color/neon_cyan"
+                    android:textSize="11sp"
+                    android:letterSpacing="0.2"
+                    android:textAllCaps="true" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:contentDescription="@string/logo_rb_desc"
+                android:scaleType="fitCenter"
+                android:src="@drawable/logo_rb" />
+        </LinearLayout>
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:textColor="#FFFFFF"
-            android:textSize="28sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/mode_title"
-            android:textColor="#B0BEC5"
-            android:textSize="16sp" />
+            style="@style/Section"
+            android:layout_marginTop="24dp"
+            android:text="@string/mode_title" />
 
         <RadioGroup
             android:id="@+id/modeGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="-4dp"
+            android:layout_marginEnd="-4dp"
+            android:layout_marginTop="8dp"
             android:orientation="horizontal">
 
             <RadioButton
                 android:id="@+id/modeSender"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/mode_sender"
-                android:textColor="#FFFFFF" />
+                style="@style/ModeCard"
+                android:text="@string/mode_sender" />
 
             <RadioButton
                 android:id="@+id/modeReceiver"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/mode_receiver"
-                android:textColor="#FFFFFF" />
+                style="@style/ModeCard"
+                android:text="@string/mode_receiver" />
         </RadioGroup>
 
         <!-- ===== Mode Émetteur ===== -->
         <LinearLayout
             android:id="@+id/senderPanel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="vertical">
+            style="@style/Card"
+            android:layout_marginTop="12dp">
+
+            <TextView
+                style="@style/Section"
+                android:text="@string/section_framing" />
 
             <Switch
                 android:id="@+id/cropSwitch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:text="@string/sender_crop"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp" />
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:thumbTint="@color/neon_cyan"
+                android:trackTint="@color/neon_violet" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
                 android:text="@string/sender_crop_hint"
-                android:textColor="#78909C"
+                android:textColor="@color/text_dim"
                 android:textSize="12sp" />
 
-            <TextView
-                android:id="@+id/zoomLabel"
-                style="@style/Label" />
+            <TextView android:id="@+id/zoomLabel" style="@style/Label" />
+            <SeekBar android:id="@+id/zoomSeek" style="@style/Seek" android:max="100" />
 
-            <SeekBar
-                android:id="@+id/zoomSeek"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:max="100" />
+            <TextView android:id="@+id/offsetXLabel" style="@style/Label" />
+            <SeekBar android:id="@+id/offsetXSeek" style="@style/Seek" android:max="200" />
 
-            <TextView
-                android:id="@+id/offsetXLabel"
-                style="@style/Label" />
-
-            <SeekBar
-                android:id="@+id/offsetXSeek"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:max="200" />
+            <TextView android:id="@+id/offsetYLabel" style="@style/Label" />
+            <SeekBar android:id="@+id/offsetYSeek" style="@style/Seek" android:max="200" />
 
             <TextView
-                android:id="@+id/offsetYLabel"
-                style="@style/Label" />
+                style="@style/Section"
+                android:layout_marginTop="26dp"
+                android:text="@string/section_quality" />
 
-            <SeekBar
-                android:id="@+id/offsetYSeek"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:max="200" />
-
-            <TextView
-                android:id="@+id/bitrateLabel"
-                style="@style/Label" />
-
-            <SeekBar
-                android:id="@+id/bitrateSeek"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:max="8" />
+            <TextView android:id="@+id/bitrateLabel" style="@style/Label" android:layout_marginTop="10dp" />
+            <SeekBar android:id="@+id/bitrateSeek" style="@style/Seek" android:max="8" />
 
             <Button
                 android:id="@+id/senderButton"
+                style="@style/NeonButton"
+                android:text="@string/sender_start" />
+
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/sender_start" />
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:text="@string/sender_discreet_hint"
+                android:textColor="@color/text_dim"
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/senderStatus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="14dp"
+                android:gravity="center"
                 android:text="@string/sender_idle"
-                android:textColor="#E0E0E0"
-                android:textSize="14sp" />
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
         </LinearLayout>
 
         <!-- ===== Mode Récepteur ===== -->
         <LinearLayout
             android:id="@+id/receiverPanel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="vertical">
+            style="@style/Card"
+            android:layout_marginTop="12dp">
+
+            <TextView
+                style="@style/Section"
+                android:text="@string/section_network" />
 
             <CheckBox
                 android:id="@+id/autoConnect"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:buttonTint="@color/neon_cyan"
                 android:text="@string/receiver_auto"
-                android:textColor="#FFFFFF" />
+                android:textColor="@color/text_primary" />
 
             <TextView
                 android:id="@+id/receiverStatus"
@@ -155,21 +189,53 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
 
+            <TextView
+                style="@style/Section"
+                android:layout_marginTop="26dp"
+                android:text="@string/direct_title" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/direct_steps"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/directIp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/neon_cyan"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/openHotspot"
+                style="@style/GhostButton"
+                android:text="@string/direct_open_settings" />
+
+            <TextView
+                style="@style/Section"
+                android:layout_marginTop="26dp"
+                android:text="@string/section_manual" />
+
             <EditText
                 android:id="@+id/manualIp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="6dp"
+                android:backgroundTint="@color/neon_blue"
                 android:hint="@string/receiver_manual_hint"
                 android:importantForAutofill="no"
                 android:inputType="text"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#78909C" />
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_dim" />
 
             <Button
                 android:id="@+id/manualConnect"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/NeonButton"
                 android:text="@string/receiver_manual_connect" />
         </LinearLayout>
     </LinearLayout>

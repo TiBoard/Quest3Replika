@@ -29,6 +29,7 @@ class StreamReceiver(
     @Volatile private var running = false
     @Volatile private var socket: Socket? = null
     private var worker: Thread? = null
+    @Volatile private var out: OutputStream? = null
 
     fun start() {
         if (running) return
@@ -76,6 +77,7 @@ class StreamReceiver(
     private fun session(s: Socket, decoder: VideoDecoder) {
         val input = DataInputStream(BufferedInputStream(s.getInputStream(), 256 * 1024))
         val out = s.getOutputStream()
+        this.out = out
         Protocol.readHandshake(input)
         listener.onStatus("Connecté à ${s.inetAddress.hostAddress}")
         requestKeyframe(out)
@@ -122,6 +124,24 @@ class StreamReceiver(
                     if (cfg != null) "${cfg.width}x${cfg.height}" else "-",
                 )
                 frames = 0; bytes = 0; lastStats = now
+            }
+        }
+    }
+
+    /** Demande à l'émetteur d'arrêter la diffusion (le casque n'a aucune interface visible pour le faire). */
+    fun sendStop() {
+        val o = out ?: return
+        thread(name = "QM-stop", isDaemon = true) {
+            try {
+                synchronized(o) {
+                    Protocol.writePacket(
+                        o, Protocol.newHeaderBuffer(),
+                        Protocol.Packet(Protocol.TYPE_STOP, 0, 0, ByteArray(0)),
+                    )
+                    o.flush()
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "sendStop", e)
             }
         }
     }

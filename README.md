@@ -17,16 +17,18 @@ Un seul APK à installer sur les deux appareils. Au lancement, choisissez **Éme
 2. [Télécharger l'APK](#2-télécharger-lapk)
 3. [Installer sur le Meta Quest 3](#3-installer-sur-le-meta-quest-3)
 4. [Installer sur la tablette](#4-installer-sur-la-tablette)
-5. [Diffuser : pas à pas](#5-diffuser--pas-à-pas)
-6. [Régler le cadrage de l'œil gauche](#6-régler-le-cadrage-de-lœil-gauche)
-7. [Dépannage](#7-dépannage)
-8. [Pour les développeurs](#8-pour-les-développeurs)
+5. [Connexion directe, sans box](#5-connexion-directe-sans-box)
+6. [Diffuser : pas à pas](#6-diffuser--pas-à-pas)
+7. [Diffusion discrète : rien dans le casque](#7-diffusion-discrète--rien-dans-le-casque)
+8. [Régler le cadrage de l'œil gauche](#8-régler-le-cadrage-de-lœil-gauche)
+9. [Dépannage](#9-dépannage)
+10. [Pour les développeurs](#10-pour-les-développeurs)
 
 ## 1. Ce qu'il vous faut
 
 - Un **Meta Quest 3** (ou 3S) avec le **mode développeur** activé (voir étape 3).
 - Une **tablette Android 8.0 ou plus récente**.
-- Un **réseau Wi-Fi commun** aux deux appareils (box en 5 GHz idéalement) ou le point d'accès d'un téléphone. Aucun accès Internet n'est nécessaire.
+- Un **réseau Wi-Fi commun** aux deux appareils. Le plus simple : le **point d'accès Wi-Fi de la tablette** (le casque s'y connecte directement, sans box ni routeur, voir l'étape 5). Une box ou le point d'accès d'un téléphone fonctionnent aussi. Aucun accès Internet n'est nécessaire.
 - Un **PC** (Windows, macOS ou Linux) avec un câble USB-C pour installer l'APK sur le casque.
 
 ## 2. Télécharger l'APK
@@ -77,7 +79,19 @@ Au choix :
 - **Sans PC** : copiez l'APK sur la tablette (téléchargement direct depuis la page Releases, clé USB, Drive…), ouvrez-le et autorisez l'installation depuis cette source quand Android le demande.
 - **Avec adb** : activez *Options pour les développeurs* → *Débogage USB* sur la tablette, branchez-la, puis `adb install -r Quest3Replika-….apk`.
 
-## 5. Diffuser : pas à pas
+## 5. Connexion directe, sans box
+
+Le casque peut se connecter **directement au Wi-Fi de la tablette** : aucun routeur, aucune box, aucun Internet.
+
+1. **Sur la tablette** : activez le **point d'accès Wi-Fi** (Paramètres → Connexions → Point d'accès mobile). Choisissez la bande **5 GHz** si la tablette le propose : c'est plus fluide. Notez le nom du réseau et le mot de passe. Dans Quest3Replika (mode Récepteur), le bouton **« Ouvrir les réglages du point d'accès »** y mène directement.
+2. **Dans le casque** : *Paramètres → Wi-Fi* → choisissez le réseau de la tablette et entrez le mot de passe. Le casque affiche peut-être « Pas d'Internet » : c'est normal, la diffusion n'en a pas besoin. Cette étape n'est à faire **qu'une fois** : le Quest retient le réseau.
+3. Lancez la diffusion (étape suivante) : la tablette **trouve le casque toute seule**. Le casque envoie une petite balise à la tablette (qui est la passerelle du réseau), sans dépendre du mDNS que beaucoup de points d'accès mobiles bloquent.
+
+<p align="center"><img src="docs/screenshots/05b-connexion-directe.png" width="80%" alt="Carte « Connexion directe » du mode Récepteur" /></p>
+
+L'adresse IP de la tablette est affichée dans cette carte, au cas où il faudrait saisir une connexion manuelle.
+
+## 6. Diffuser : pas à pas
 
 ### Étape 1 : la tablette en mode Récepteur
 
@@ -99,15 +113,13 @@ Ici, le recadrage est désactivé pour la démonstration (l'émulateur n'affiche
 
 <p align="center"><img src="docs/screenshots/02-consentement.png" width="80%" alt="Fenêtre de consentement à la capture d'écran" /></p>
 
-L'application indique alors son adresse et attend la tablette :
+**L'application se ferme aussitôt toute seule** : le casque revient à l'accueil et la diffusion continue en arrière-plan.
 
-<p align="center"><img src="docs/screenshots/03-diffusion.png" width="80%" alt="Diffusion en cours" /></p>
+<p align="center"><img src="docs/screenshots/03-diffusion.png" width="80%" alt="Après le démarrage, l'application s'est fermée : le casque est libre" /></p>
 
 ### Étape 3 : jouez !
 
-Vous pouvez quitter Quest3Replika et lancer n'importe quel jeu ou application VR : la diffusion continue en arrière-plan. Une notification **« Quest3Replika diffuse l'écran »** le rappelle, avec un bouton **Arrêter**.
-
-<p align="center"><img src="docs/screenshots/04-notification.png" width="80%" alt="Notification du service de diffusion" /></p>
+Lancez n'importe quel jeu ou application VR : la diffusion continue en arrière-plan, sans rien afficher dans le casque. Le joueur ne voit que son jeu ou sa vidéo (voir [l'étape 7](#7-diffusion-discrète--rien-dans-le-casque)).
 
 Sur la tablette, l'image s'affiche en plein écran. Touchez l'écran pour afficher ou masquer les statistiques (résolution, images par seconde, débit).
 
@@ -115,9 +127,31 @@ Sur la tablette, l'image s'affiche en plein écran. Touchez l'écran pour affich
 
 > Capture réalisée dans l'émulateur, où émetteur et récepteur tournent sur le même appareil : la tablette affiche donc son propre écran (effet miroir) et l'encodage logiciel limite la cadence. Sur un vrai Quest 3, vous verrez l'image du casque à 30 i/s.
 
-Pour arrêter : bouton **Arrêter** de la notification, ou **Arrêter la diffusion** dans l'application. Si le Wi-Fi coupe, la tablette se reconnecte toute seule.
+**Pour arrêter, depuis la tablette** : touchez l'écran pour afficher les statistiques, puis **« Arrêter la diffusion du casque »**. Rien n'est à faire dans le casque. Si le Wi-Fi coupe, la tablette se reconnecte toute seule.
 
-## 6. Régler le cadrage de l'œil gauche
+## 7. Diffusion discrète : rien dans le casque
+
+Pendant la diffusion, le joueur ne doit voir que son jeu. Quest3Replika est conçu pour cela :
+
+- **L'application se ferme** dès que la diffusion démarre (aucune fenêtre ne reste dans le casque).
+- **Aucune notification visible** : le service de capture utilise une notification de priorité minimale, silencieuse, sans icône ni bulle. L'application ne demande jamais l'autorisation d'afficher des notifications (sous Android 13 et plus, sans cette autorisation, la notification n'apparaît pas).
+- **Aucune fenêtre de permission** au lancement.
+- **L'arrêt se fait depuis la tablette** (bouton « Arrêter la diffusion du casque »).
+
+### Démarrer sans toucher à l'interface du casque
+
+Depuis un PC (câble USB ou `adb connect`), cette commande ouvre l'application et lance la diffusion directement :
+
+```bash
+adb shell am start -n com.tiboard.quest3replika/.MainActivity --ez autostart true
+```
+
+### Ce qu'Android impose et que l'application ne peut pas masquer
+
+- Au démarrage, Android affiche **une fenêtre de consentement** à la capture d'écran (« Commencer »). Elle apparaît une fois, avant que le joueur ne lance son jeu. Option avancée **à tester sur votre casque** : `adb shell appops set com.tiboard.quest3replika PROJECT_MEDIA allow` autorise l'application à capturer sans cette fenêtre sur certaines versions d'Android.
+- Le système peut afficher son propre indicateur « enregistrement / diffusion en cours ». Il appartient au système et ne peut pas être retiré par une application.
+
+## 8. Régler le cadrage de l'œil gauche
 
 En VR, le Quest affiche une image par œil, côte à côte. L'option **Recadrer sur l'œil gauche** n'envoie que l'image de gauche, pour un rendu naturel sur la tablette.
 
@@ -130,16 +164,17 @@ En VR, le Quest affiche une image par œil, côte à côte. L'option **Recadrer 
 
 Tous ces réglages s'appliquent **en direct** pendant la diffusion : rouvrez Quest3Replika dans le casque, bougez les curseurs et regardez le résultat sur la tablette. Si l'image n'est pas en côte à côte (application 2D, menus), désactivez simplement le recadrage.
 
-## 7. Dépannage
+## 9. Dépannage
 
 | Problème | Solution |
 |---|---|
-| La tablette ne trouve pas le casque | Vérifiez que les deux sont sur le même Wi-Fi. Certaines box bloquent la découverte (« isolation des clients ») : utilisez la connexion manuelle avec l'IP affichée dans le casque. |
+| La tablette ne trouve pas le casque | Vérifiez que le casque est bien connecté au Wi-Fi de la tablette (ou que les deux sont sur le même réseau). Certaines box bloquent la découverte (« isolation des clients ») : préférez le point d'accès de la tablette, ou utilisez la connexion manuelle avec l'adresse IP du casque. |
+| Le casque ne se connecte pas au point d'accès de la tablette | Vérifiez le mot de passe, essayez la bande 2,4 GHz si la 5 GHz n'est pas visible, et gardez le point d'accès actif (certaines tablettes l'éteignent sans appareil connecté). |
 | Image saccadée ou en retard | Rapprochez-vous de la box, passez en 5 GHz, baissez le débit à 3-4 Mbit/s. |
 | Écran noir au début | Normal pendant moins d'une seconde : la tablette attend la première image complète. |
 | La diffusion s'arrête quand le casque se met en veille | Le système coupe la capture : relancez la diffusion depuis l'application. |
 | `adb install` répond `INSTALL_FAILED_UPDATE_INCOMPATIBLE` | L'ancienne version a une autre signature : `adb uninstall com.tiboard.quest3replika`, puis réinstallez. |
-| Pas de notification | Autorisez les notifications pour Quest3Replika dans les paramètres Android. |
+| L'application ne se réouvre pas dans le casque pendant la diffusion | C'est voulu. Pour la rouvrir (réglages du cadrage), lancez-la depuis *Bibliothèque → Sources inconnues* : les curseurs agissent en direct. |
 
 Journaux utiles (casque ou tablette branchés au PC) :
 
@@ -147,7 +182,7 @@ Journaux utiles (casque ou tablette branchés au PC) :
 adb logcat -s CaptureService StreamSender VideoEncoder ScreenCapturer GlCropRenderer StreamReceiver VideoDecoder
 ```
 
-## 8. Pour les développeurs
+## 10. Pour les développeurs
 
 ### Fonctionnement
 
@@ -160,7 +195,7 @@ MediaProjection → VirtualDisplay → GL (recadrage œil gauche)          TCP �
 
 - **Vidéo** : H.264 matériel, 720p max à 30 i/s, débit de 2 à 10 Mbit/s (5 par défaut), image clé chaque seconde et à chaque connexion. Pas d'audio.
 - **Latence** : aucun tampon de lecture. Si le Wi-Fi sature, l'émetteur jette le retard (plus de ~200 ms en file) et repart sur une image clé plutôt que d'accumuler du décalage.
-- **Découverte** : NSD/mDNS (`_questmirror._tcp`, port 47800), IP manuelle en secours.
+- **Découverte** : NSD/mDNS (`_questmirror._tcp`, port 47800), balise UDP du casque vers la passerelle (port 47801) pour le point d'accès de la tablette, IP manuelle en secours.
 - **Arrière-plan** : service au premier plan de type `mediaProjection`, WakeLock, WifiLock basse latence, MulticastLock.
 - **Aucune dépendance externe** : SDK Android et bibliothèque standard Kotlin uniquement.
 
@@ -195,8 +230,8 @@ Le dépôt contient un keystore de debug (`keystore/debug.keystore`, mot de pass
 | Permission | Pourquoi |
 |---|---|
 | `FOREGROUND_SERVICE` + `FOREGROUND_SERVICE_MEDIA_PROJECTION` | Service de capture qui tourne en arrière-plan (obligatoire depuis Android 14) |
-| `POST_NOTIFICATIONS` (demandée au lancement, Android 13+) | Notification du service de capture |
-| `NEARBY_WIFI_DEVICES` (`neverForLocation`, Android 13+) | Wi-Fi local, sans accès à la localisation |
+| `POST_NOTIFICATIONS` (déclarée mais **jamais demandée**) | Notification du service de capture ; sans l'autorisation, elle reste invisible, ce qui garde le casque propre |
+| `NEARBY_WIFI_DEVICES` (`neverForLocation`, Android 13+) | Wi-Fi local, sans accès à la localisation (aucune fenêtre de demande) |
 | `CHANGE_WIFI_MULTICAST_STATE` | Réception des annonces mDNS |
 | `INTERNET`, `ACCESS_NETWORK_STATE`, `ACCESS_WIFI_STATE` | Sockets TCP en réseau local (aucun accès Internet utilisé) |
 | `WAKE_LOCK` | Empêcher la mise en veille du CPU / Wi-Fi pendant la diffusion |
@@ -210,11 +245,12 @@ app/src/main/java/com/tiboard/quest3replika/
 ├── MainActivity.kt              Choix du mode, réglages, lancement émetteur / liste des émetteurs
 ├── common/
 │   ├── Protocol.kt              Protocole binaire (poignée de main, CONFIG, FRAME, demande d'image clé)
-│   ├── Permissions.kt           Permissions Android 13+ et adresses IP locales
+│   ├── Permissions.kt           Utilitaires de permissions et adresses IP locales
 │   └── Prefs.kt                 Réglages persistants et calcul de la zone de recadrage
 ├── discovery/
 │   ├── NsdAdvertiser.kt         Annonce mDNS de l'émetteur
-│   └── NsdScanner.kt            Découverte et résolution des émetteurs
+│   ├── NsdScanner.kt            Découverte et résolution des émetteurs
+│   └── Beacon.kt                Balise UDP casque → tablette (point d'accès de la tablette)
 ├── sender/
 │   ├── CaptureService.kt        Service au premier plan mediaProjection, verrous, notification
 │   ├── ScreenCapturer.kt        VirtualDisplay + reconstruction du pipeline à chaud

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg_deep">#05060F</color>
+    <color name="bg_mid">#0B0D24</color>
+    <color name="surface">#10133A</color>
+    <color name="surface_alt">#171B4D</color>
+    <color name="neon_cyan">#00D4FF</color>
+    <color name="neon_violet">#B14CFF</color>
+    <color name="neon_blue">#4A6BFF</color>
+    <color name="text_primary">#F2F4FF</color>
+    <color name="text_secondary">#9AA3D6</color>
+    <color name="text_dim">#5E6799</color>
+    <color name="stroke_soft">#3340507F</color>
+    <color name="stroke_neon">#8000D4FF</color>
+</resources>

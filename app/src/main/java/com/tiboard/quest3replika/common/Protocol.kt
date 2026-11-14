@@ -23,11 +23,15 @@ import java.nio.ByteOrder
  *   TYPE_FRAME  : une unité d'accès H.264 Annex-B (FLAG_KEYFRAME si IDR)
  * Récepteur -> émetteur :
  *   TYPE_REQUEST_KEYFRAME : demande d'image clé (aucune charge utile)
+ *   TYPE_STOP : demande d'arrêt de la diffusion (aucune charge utile)
  */
 object Protocol {
     const val SERVICE_TYPE = "_questmirror._tcp."
     const val SERVICE_NAME_PREFIX = "Quest3Replika"
     const val DEFAULT_PORT = 47800
+
+    /** Port UDP sur lequel la tablette écoute les balises du casque (découverte sans mDNS). */
+    const val BEACON_PORT = 47801
 
     const val MAGIC = 0x514D3031 // "QM01"
     const val VERSION = 1
@@ -35,6 +39,7 @@ object Protocol {
     const val TYPE_CONFIG: Byte = 1
     const val TYPE_FRAME: Byte = 2
     const val TYPE_REQUEST_KEYFRAME: Byte = 10
+    const val TYPE_STOP: Byte = 11
 
     const val FLAG_KEYFRAME: Int = 1
 
