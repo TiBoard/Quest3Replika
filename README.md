@@ -221,6 +221,8 @@ Pour publier une version numérotée :
 git tag v1.0.0 && git push origin v1.0.0
 ```
 
+Ou, sans ligne de commande : sur GitHub, *Releases → Draft a new release*, créez le tag `v1.0.0` sur `main` et publiez : le workflow joint l'APK à la release.
+
 ### Signature
 
 Le dépôt contient un keystore de debug (`keystore/debug.keystore`, mot de passe `android`) : toutes les compilations ont la même signature, donc `adb install -r` met à jour l'application sans la désinstaller. Pour une clé privée, ajoutez dans *Settings → Secrets and variables → Actions* les secrets `QR_KEYSTORE_BASE64` (keystore encodé en base64), `QR_KEYSTORE_PASSWORD`, `QR_KEY_ALIAS` et `QR_KEY_PASSWORD` : le workflow les utilise automatiquement (il faudra alors désinstaller une fois l'ancienne version).
