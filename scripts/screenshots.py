@@ -105,10 +105,11 @@ time.sleep(1.5)
 cap("01-emetteur.png")
 
 # 2. Démarrage de la diffusion (fenêtre de consentement MediaProjection)
-tap_text("Démarrer la diffusion")
+tap_id(f"{PKG}:id/senderButton")
 time.sleep(3)
 cap("02-consentement.png")
-tap_id("android:id/button1")
+if not tap_id("android:id/button1"):
+    tap(lambda n: n.get("text", "").lower() in ("start now", "start", "commencer"), "bouton Start")
 time.sleep(5)
 cap("03-diffusion.png")
 
@@ -131,7 +132,7 @@ if "ReceiverActivity" not in out:
     shell("input text 127.0.0.1")
     shell("input keyevent KEYCODE_BACK")
     time.sleep(1)
-    tap_text("Connexion manuelle")
+    tap_id(f"{PKG}:id/manualConnect")
 time.sleep(8)
 cap("06-flux.png")
 print(shell(f"logcat -d -s StreamReceiver VideoDecoder StreamSender VideoEncoder ScreenCapturer CaptureService | tail -40"))
