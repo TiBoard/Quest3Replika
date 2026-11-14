@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Quest3Replika</string>
+    <string name="mode_title">Choisir le mode</string>
+    <string name="mode_sender">Émetteur (Meta Quest 3)</string>
+    <string name="mode_receiver">Récepteur (tablette)</string>
+
+    <string name="sender_crop">Recadrer sur l\'œil gauche</string>
+    <string name="sender_crop_hint">Supprime le double affichage côte à côte. L\'activation/désactivation redémarre l\'encodeur ; le zoom et le décalage s\'appliquent en direct.</string>
+    <string name="sender_zoom">Zoom</string>
+    <string name="sender_offset_x">Décalage horizontal</string>
+    <string name="sender_offset_y">Décalage vertical</string>
+    <string name="sender_bitrate">Débit vidéo</string>
+    <string name="sender_start">Démarrer la diffusion</string>
+    <string name="sender_stop">Arrêter la diffusion</string>
+    <string name="sender_idle">Diffusion arrêtée.</string>
+
+    <string name="receiver_searching">Recherche des émetteurs sur le réseau local…</string>
+    <string name="receiver_found">Émetteurs trouvés (touchez pour vous connecter) :</string>
+    <string name="receiver_auto">Se connecter automatiquement au premier émetteur trouvé</string>
+    <string name="receiver_manual_hint">Adresse IP manuelle (ex. 192.168.1.42)</string>
+    <string name="receiver_manual_connect">Connexion manuelle</string>
+
+    <string name="notif_channel">Diffusion de l\'écran</string>
+    <string name="notif_title">Quest3Replika diffuse l\'écran</string>
+    <string name="notif_stop">Arrêter</string>
+    <string name="perm_denied">Permission refusée : certaines fonctions peuvent ne pas marcher.</string>
+    <string name="projection_denied">Capture d\'écran refusée.</string>
+</resources>
