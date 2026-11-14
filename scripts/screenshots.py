@@ -21,7 +21,25 @@ def shell(cmd):
     return adb("shell", cmd, check=False)
 
 
+def dismiss_anr():
+    """Ferme les fenêtres « … isn't responding » de l'émulateur (lent sans GPU) en choisissant « Wait »."""
+    for _ in range(3):
+        found = False
+        for n in nodes():
+            if n.get("text", "") in ("Wait", "Attendre") and n.get("clickable") == "true" or \
+                    n.get("resource-id", "") == "android:id/aerr_wait":
+                x1, y1, x2, y2 = map(int, re.findall(r"\d+", n.get("bounds")))
+                shell(f"input tap {(x1 + x2) // 2} {(y1 + y2) // 2}")
+                print("ANR fermée", flush=True)
+                found = True
+                time.sleep(1.5)
+                break
+        if not found:
+            return
+
+
 def cap(name):
+    dismiss_anr()
     os.makedirs(OUT, exist_ok=True)
     with open(os.path.join(OUT, name), "wb") as f:
         f.write(subprocess.run(["adb", "exec-out", "screencap", "-p"], check=True, capture_output=True).stdout)
@@ -58,6 +76,7 @@ def tap(pred, label, retries=5):
 
 
 def tap_text(t):
+    dismiss_anr()
     return tap(lambda n: n.get("text", "") == t, t)
 
 
@@ -71,6 +90,10 @@ shell("settings put system screen_off_timeout 1800000")
 shell("svc power stayon true")
 shell("input keyevent KEYCODE_WAKEUP")
 shell("wm dismiss-keyguard")
+shell("settings put global hide_error_dialogs 1")
+# Résolution de tablette 10" classique : textes lisibles et rendu logiciel plus léger.
+shell("wm size 1920x1200")
+shell("wm density 240")
 time.sleep(20)  # laisse le système finir son démarrage (sinon uiautomator échoue)
 adb("install", "-r", "-g", APK)
 
