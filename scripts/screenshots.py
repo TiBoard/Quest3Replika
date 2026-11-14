@@ -96,6 +96,15 @@ shell("wm size 1920x1200")
 shell("wm density 240")
 time.sleep(20)  # laisse le système finir son démarrage (sinon uiautomator échoue)
 adb("install", "-r", "-g", APK)
+# Connexion automatique désactivée pour pouvoir capturer la liste des émetteurs trouvés.
+with open("/tmp/quest3replika.xml", "w") as f:
+    f.write("<?xml version='1.0' encoding='utf-8' standalone='yes' ?>\n"
+            "<map><boolean name=\"auto_connect\" value=\"false\" /></map>\n")
+adb("push", "/tmp/quest3replika.xml", "/data/local/tmp/quest3replika.xml")
+shell("chmod 644 /data/local/tmp/quest3replika.xml")
+shell(f"run-as {PKG} mkdir -p shared_prefs")
+shell(f"run-as {PKG} cp /data/local/tmp/quest3replika.xml shared_prefs/quest3replika.xml")
+print(shell(f"run-as {PKG} cat shared_prefs/quest3replika.xml"), flush=True)
 
 # 1. Mode Émetteur
 shell(f"am start -W -n {PKG}/.MainActivity")
@@ -103,6 +112,10 @@ time.sleep(4)
 tap_text("Émetteur (Meta Quest 3)")
 time.sleep(1.5)
 cap("01-emetteur.png")
+
+# L'émulateur affiche un écran 2D (pas de côte à côte) : on désactive le recadrage pour la démo.
+tap_id(f"{PKG}:id/cropSwitch")
+time.sleep(1)
 
 # 2. Démarrage de la diffusion (fenêtre de consentement MediaProjection)
 tap_id(f"{PKG}:id/senderButton")
@@ -125,14 +138,13 @@ tap_text("Récepteur (tablette)")
 time.sleep(8)
 cap("05-recepteur.png")
 
-# 5. Flux reçu (connexion automatique ou manuelle sur 127.0.0.1)
-out = shell("dumpsys activity activities | grep -i ReceiverActivity | head -1")
-if "ReceiverActivity" not in out:
-    tap(lambda n: n.get("resource-id", "").endswith(":id/manualIp"), "champ IP")
-    shell("input text 127.0.0.1")
-    shell("input keyevent KEYCODE_BACK")
-    time.sleep(1)
-    tap_id(f"{PKG}:id/manualConnect")
-time.sleep(8)
+# 5. Connexion à l'émetteur trouvé, puis flux reçu en plein écran
+tap(lambda n: n.get("text", "").startswith("Quest3Replika "), "émetteur trouvé")
+time.sleep(10)
+shell("input tap 960 600")  # masque les statistiques
+time.sleep(3)
 cap("06-flux.png")
+shell("input tap 960 600")  # réaffiche les statistiques
+time.sleep(4)
+cap("07-flux-stats.png")
 print(shell(f"logcat -d -s StreamReceiver VideoDecoder StreamSender VideoEncoder ScreenCapturer CaptureService | tail -40"))
