@@ -7,6 +7,7 @@ on:
     paths:
       - .github/workflows/screenshots.yml
       - scripts/screenshots.py
+      - app/src/main/res/**
 
 permissions:
   contents: write
@@ -61,5 +62,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           ls -la docs/screenshots
-          gh release view screenshots >/dev/null 2>&1 || gh release create screenshots --prerelease --title "Captures d'écran" --notes "Captures générées automatiquement par le workflow screenshots." --target "$GITHUB_SHA"
-          ls docs/screenshots/*.png >/dev/null 2>&1 && gh release upload screenshots docs/screenshots/*.png --clobber
+          # Une release par branche, pour ne pas écraser les captures d'une autre branche.
+          TAG="screenshots-$(echo "$GITHUB_REF_NAME" | tr '/' '-')"
+          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --prerelease --title "Captures d'écran ($GITHUB_REF_NAME)" --notes "Captures générées automatiquement par le workflow screenshots." --target "$GITHUB_SHA"
+          ls docs/screenshots/*.png >/dev/null 2>&1 && gh release upload "$TAG" docs/screenshots/*.png --clobber

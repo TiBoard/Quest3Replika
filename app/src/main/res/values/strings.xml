@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Quest3Replika</string>
-    <string name="mode_title">Choisir le mode</string>
+    <string name="mode_title">Mode</string>
+    <string name="tagline">Miroir VR · faible latence</string>
+    <string name="logo_desc">Logo RB</string>
+    <string name="section_framing">Cadrage</string>
+    <string name="section_quality">Qualité</string>
+    <string name="section_network">Réseau local</string>
+    <string name="section_manual">Connexion manuelle</string>
     <string name="mode_sender">Émetteur (Meta Quest 3)</string>
     <string name="mode_receiver">Récepteur (tablette)</string>
 
@@ -19,7 +25,7 @@
     <string name="receiver_found">Émetteurs trouvés (touchez pour vous connecter) :</string>
     <string name="receiver_auto">Se connecter automatiquement au premier émetteur trouvé</string>
     <string name="receiver_manual_hint">Adresse IP manuelle (ex. 192.168.1.42)</string>
-    <string name="receiver_manual_connect">Connexion manuelle</string>
+    <string name="receiver_manual_connect">Se connecter</string>
 
     <string name="notif_channel">Diffusion de l\'écran</string>
     <string name="notif_title">Quest3Replika diffuse l\'écran</string>

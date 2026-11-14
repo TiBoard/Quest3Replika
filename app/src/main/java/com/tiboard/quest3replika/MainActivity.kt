@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
 import android.os.Bundle
+import android.view.ContextThemeWrapper
 import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
@@ -194,9 +195,14 @@ class MainActivity : Activity() {
         senderList.removeAllViews()
         receiverStatus.setText(if (list.isEmpty()) R.string.receiver_searching else R.string.receiver_found)
         for (s in list) {
-            val b = Button(this)
+            val b = Button(ContextThemeWrapper(this, R.style.GhostButton), null, 0)
+            b.setBackgroundResource(R.drawable.btn_ghost)
+            b.setTextColor(getColor(R.color.text_primary))
             b.text = "${s.name}\n${s.host}:${s.port}"
             b.isAllCaps = false
+            b.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = (10 * resources.displayMetrics.density).toInt() }
             b.setOnClickListener { openReceiver(s.name, s.host, s.port) }
             senderList.addView(b)
         }

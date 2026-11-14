@@ -16,9 +16,23 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|start"
-        android:layout_margin="8dp"
-        android:background="#80000000"
-        android:padding="6dp"
-        android:textColor="#FFFFFF"
+        android:layout_margin="12dp"
+        android:background="@drawable/bg_overlay"
+        android:paddingBottom="8dp"
+        android:paddingEnd="12dp"
+        android:paddingStart="12dp"
+        android:paddingTop="8dp"
+        android:textColor="@color/neon_cyan"
         android:textSize="12sp" />
+
+    <!-- Logo discret dans le coin, visible avec les statistiques -->
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="12dp"
+        android:alpha="0.85"
+        android:contentDescription="@string/logo_desc"
+        android:src="@drawable/logo_rb" />
 </FrameLayout>
