@@ -1,0 +1,65 @@
+name: Captures d'écran
+
+# Lance l'application dans un émulateur Android et publie les captures dans la release « screenshots ».
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/screenshots.yml
+      - scripts/screenshots.py
+
+permissions:
+  contents: write
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Compiler l'APK
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Libérer de l'espace disque
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /usr/local/share/boost /usr/local/lib/android/sdk/ndk /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force || true
+          df -h /
+
+      - name: Activer KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Émulateur et captures
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          profile: pixel_c
+          disable-animations: true
+          disk-size: 4096M
+          ram-size: 3072M
+          cores: 4
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: python3 scripts/screenshots.py app/build/outputs/apk/debug/app-debug.apk docs/screenshots
+
+      - name: Publier les captures
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ls -la docs/screenshots
+          gh release view screenshots >/dev/null 2>&1 || gh release create screenshots --prerelease --title "Captures d'écran" --notes "Captures générées automatiquement par le workflow screenshots." --target "$GITHUB_SHA"
+          ls docs/screenshots/*.png >/dev/null 2>&1 && gh release upload screenshots docs/screenshots/*.png --clobber

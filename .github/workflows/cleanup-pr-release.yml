@@ -1,0 +1,18 @@
+name: Nettoyer la préversion de PR
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Supprimer la release pr-N
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: gh release delete "pr-${PR_NUMBER}" --yes --cleanup-tag -R "$GITHUB_REPOSITORY" || true
