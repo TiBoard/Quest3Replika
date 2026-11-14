@@ -29,7 +29,8 @@ Chaque push est compilé par GitHub Actions (workflow `.github/workflows/build-a
 
 - **Branche `main`** : l'APK est publié dans la release **« latest »** (onglet *Releases* du dépôt).
 - **Tag `v*`** (ex. `v1.0.0`) : une release versionnée avec l'APK est créée.
-- **Pull request / autre branche** : l'APK est disponible en artefact `Quest3Replika-apk` dans l'onglet *Actions* → le run → *Artifacts*.
+- **Pull request** : une préversion **« pr-N »** avec l'APK est publiée dans *Releases* (supprimée à la fermeture de la PR).
+- **Tous les runs** : l'APK est aussi joint en artefact `Quest3Replika-apk` (onglet *Actions* → le run → *Artifacts*), si le quota de stockage d'artefacts du compte le permet.
 
 ### Compiler soi-même
 
