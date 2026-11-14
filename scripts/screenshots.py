@@ -29,9 +29,19 @@ def cap(name):
 
 
 def nodes():
-    shell("uiautomator dump /sdcard/ui.xml")
-    xml = adb("exec-out", "cat", "/sdcard/ui.xml")
-    return ET.fromstring(xml).iter("node")
+    """Arbre d'interface courant (liste vide si uiautomator échoue, ex. système pas encore au repos)."""
+    for _ in range(4):
+        shell("rm -f /sdcard/ui.xml")
+        print(shell("uiautomator dump /sdcard/ui.xml").strip(), flush=True)
+        xml = adb("exec-out", "cat", "/sdcard/ui.xml", check=False)
+        start = xml.find("<?xml")
+        if start >= 0:
+            try:
+                return list(ET.fromstring(xml[start:]).iter("node"))
+            except ET.ParseError as e:
+                print("XML illisible :", e, flush=True)
+        time.sleep(2)
+    return []
 
 
 def tap(pred, label, retries=5):
@@ -61,6 +71,7 @@ shell("settings put system screen_off_timeout 1800000")
 shell("svc power stayon true")
 shell("input keyevent KEYCODE_WAKEUP")
 shell("wm dismiss-keyguard")
+time.sleep(20)  # laisse le système finir son démarrage (sinon uiautomator échoue)
 adb("install", "-r", "-g", APK)
 
 # 1. Mode Émetteur
