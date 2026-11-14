@@ -23,6 +23,7 @@ import com.tiboard.quest3replika.R
 import com.tiboard.quest3replika.common.Permissions
 import com.tiboard.quest3replika.common.Prefs
 import com.tiboard.quest3replika.common.Protocol
+import com.tiboard.quest3replika.discovery.BeaconSender
 import com.tiboard.quest3replika.discovery.NsdAdvertiser
 
 /**
@@ -42,6 +43,7 @@ class CaptureService : Service(), StreamSender.Listener {
     private var sender: StreamSender? = null
     private var capturer: ScreenCapturer? = null
     private var advertiser: NsdAdvertiser? = null
+    private var beacon: BeaconSender? = null
     private var wakeLock: PowerManager.WakeLock? = null
     private var wifiLock: WifiManager.WifiLock? = null
     private var multicastLock: WifiManager.MulticastLock? = null
@@ -116,6 +118,8 @@ class CaptureService : Service(), StreamSender.Listener {
         sender = s
 
         advertiser = NsdAdvertiser(this, port).also { it.start() }
+        // Balise UDP vers la passerelle : fonctionne quand le casque est connecté au point d'accès de la tablette.
+        beacon = BeaconSender(this, port, Build.MODEL).also { it.start() }
 
         capturer = ScreenCapturer(this, mp, s, prefs) { e ->
             Log.e(TAG, "Erreur d'encodage", e)
@@ -151,12 +155,22 @@ class CaptureService : Service(), StreamSender.Listener {
         capturer?.requestKeyframe()
     }
 
+    /** La tablette demande l'arrêt : le casque n'affiche rien, c'est le seul moyen d'arrêter sans l'ouvrir. */
+    override fun onStopRequested() {
+        main.post { stopSelf() }
+    }
+
     // --- Notification & état ---
 
     private fun createChannel() {
         val nm = getSystemService(NotificationManager::class.java)
-        val ch = NotificationChannel(CHANNEL_ID, getString(R.string.notif_channel), NotificationManager.IMPORTANCE_LOW)
+        // Importance minimale : ni son, ni bulle, ni icône dans la barre d'état, rien d'affiché dans le casque.
+        val ch = NotificationChannel(CHANNEL_ID, getString(R.string.notif_channel), NotificationManager.IMPORTANCE_MIN)
         ch.setShowBadge(false)
+        ch.setSound(null, null)
+        ch.enableVibration(false)
+        ch.enableLights(false)
+        ch.lockscreenVisibility = Notification.VISIBILITY_SECRET
         nm.createNotificationChannel(ch)
     }
 
@@ -175,6 +189,9 @@ class CaptureService : Service(), StreamSender.Listener {
             .setContentText(text)
             .setContentIntent(open)
             .setOngoing(true)
+            .setOnlyAlertOnce(true)
+            .setVisibility(Notification.VISIBILITY_SECRET)
+            .setShowWhen(false)
             .setCategory(Notification.CATEGORY_SERVICE)
             .addAction(Notification.Action.Builder(null, getString(R.string.notif_stop), stop).build())
             .build()
@@ -228,6 +245,7 @@ class CaptureService : Service(), StreamSender.Listener {
         stopping = true
         prefs.sp.unregisterOnSharedPreferenceChangeListener(prefsListener)
         advertiser?.stop(); advertiser = null
+        beacon?.stop(); beacon = null
         try { capturer?.stop() } catch (e: Exception) { Log.w(TAG, "capturer.stop", e) }
         capturer = null
         sender?.stop(); sender = null
@@ -243,7 +261,7 @@ class CaptureService : Service(), StreamSender.Listener {
 
     companion object {
         private const val TAG = "CaptureService"
-        private const val CHANNEL_ID = "capture"
+        private const val CHANNEL_ID = "capture_quiet"
         private const val NOTIF_ID = 42
 
         const val ACTION_START = "com.tiboard.quest3replika.START"

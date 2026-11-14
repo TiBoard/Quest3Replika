@@ -133,10 +133,19 @@ cap("04-notification.png")
 shell("cmd statusbar collapse")
 time.sleep(1.5)
 
+# L'application s'est fermée toute seule (mode discret) : on la rouvre pour la suite des captures.
+shell(f"am start -n {PKG}/.MainActivity")
+time.sleep(3)
+
 # 4. Mode Récepteur : découverte NSD (l'émetteur tourne sur le même appareil)
 tap_text("Récepteur (tablette)")
 time.sleep(8)
 cap("05-recepteur.png")
+shell("input swipe 960 1000 960 250 300")  # fait défiler jusqu'à la carte « connexion directe »
+time.sleep(1.5)
+cap("05b-connexion-directe.png")
+shell("input swipe 960 250 960 1000 300")
+time.sleep(1.5)
 
 # 5. Connexion à l'émetteur trouvé, puis flux reçu en plein écran
 tap(lambda n: n.get("text", "").startswith("Quest3Replika "), "émetteur trouvé")

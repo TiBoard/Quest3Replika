@@ -24,6 +24,7 @@ class StreamSender(private val listener: Listener) {
         fun onClientConnected(address: String)
         fun onClientDisconnected(address: String)
         fun onKeyframeRequested()
+        fun onStopRequested()
     }
 
     @Volatile private var running = false
@@ -159,9 +160,13 @@ class StreamSender(private val listener: Listener) {
                 val input = DataInputStream(socket.getInputStream())
                 while (open) {
                     val p = Protocol.readPacket(input, header)
-                    if (p.type == Protocol.TYPE_REQUEST_KEYFRAME) {
-                        waitKeyframe = true
-                        listener.onKeyframeRequested()
+                    when (p.type) {
+                        Protocol.TYPE_REQUEST_KEYFRAME -> {
+                            waitKeyframe = true
+                            listener.onKeyframeRequested()
+                        }
+
+                        Protocol.TYPE_STOP -> listener.onStopRequested()
                     }
                 }
             } catch (e: Exception) {

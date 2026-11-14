@@ -25,6 +25,16 @@
         android:textColor="@color/neon_cyan"
         android:textSize="12sp" />
 
+    <Button
+        android:id="@+id/stopButton"
+        style="@style/GhostButton"
+        android:layout_width="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="24dp"
+        android:paddingEnd="24dp"
+        android:paddingStart="24dp"
+        android:text="@string/receiver_stop_remote" />
+
     <!-- Logo discret dans le coin, visible avec les statistiques -->
     <ImageView
         android:id="@+id/logo"
@@ -33,6 +43,6 @@
         android:layout_gravity="top|end"
         android:layout_margin="12dp"
         android:alpha="0.85"
-        android:contentDescription="@string/logo_desc"
+        android:contentDescription="@string/logo_rb_desc"
         android:src="@drawable/logo_rb" />
 </FrameLayout>

@@ -14,6 +14,7 @@ import android.widget.TextView
 import com.tiboard.quest3replika.R
 import com.tiboard.quest3replika.common.Prefs
 import com.tiboard.quest3replika.common.Protocol
+import com.tiboard.quest3replika.discovery.BeaconListener
 import com.tiboard.quest3replika.discovery.NsdScanner
 import java.net.InetSocketAddress
 
@@ -27,6 +28,8 @@ class ReceiverActivity : Activity(), SurfaceHolder.Callback, StreamReceiver.List
     private lateinit var overlay: TextView
     private lateinit var prefs: Prefs
     private var scanner: NsdScanner? = null
+    private var beacons: BeaconListener? = null
+    private lateinit var stopButton: View
     private var receiver: StreamReceiver? = null
 
     @Volatile private var target: InetSocketAddress? = null
@@ -44,6 +47,12 @@ class ReceiverActivity : Activity(), SurfaceHolder.Callback, StreamReceiver.List
         prefs = Prefs(this)
         surfaceView = findViewById(R.id.videoSurface)
         overlay = findViewById(R.id.overlay)
+        stopButton = findViewById(R.id.stopButton)
+        stopButton.setOnClickListener {
+            receiver?.sendStop()
+            statusText = getString(R.string.receiver_stop_sent)
+            refreshOverlay()
+        }
         surfaceView.holder.addCallback(this)
         findViewById<View>(R.id.root).setOnClickListener {
             showOverlay = !showOverlay
@@ -62,17 +71,23 @@ class ReceiverActivity : Activity(), SurfaceHolder.Callback, StreamReceiver.List
                 list.firstOrNull { it.name == wantedName }?.let { target = InetSocketAddress(it.host, it.port) }
             }
         }
+        // Casque connecté directement au point d'accès de la tablette : il annonce sa présence par balise UDP.
+        beacons = BeaconListener(this) { s ->
+            if (target == null) target = InetSocketAddress(s.host, s.port)
+        }
         hideSystemBars()
     }
 
     override fun onResume() {
         super.onResume()
         scanner?.start()
+        beacons?.start()
         hideSystemBars()
     }
 
     override fun onPause() {
         scanner?.stop()
+        beacons?.stop()
         super.onPause()
     }
 
@@ -109,6 +124,7 @@ class ReceiverActivity : Activity(), SurfaceHolder.Callback, StreamReceiver.List
 
     private fun refreshOverlay() {
         overlay.visibility = if (showOverlay) View.VISIBLE else View.GONE
+        stopButton.visibility = if (showOverlay) View.VISIBLE else View.GONE
         val name = wantedName ?: target?.hostString ?: ""
         overlay.text = listOf(name, statusText, statsText).filter { it.isNotBlank() }.joinToString("\n")
     }

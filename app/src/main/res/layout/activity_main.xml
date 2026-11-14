@@ -21,6 +21,14 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
+            <ImageView
+                android:layout_width="76dp"
+                android:layout_height="76dp"
+                android:layout_marginEnd="14dp"
+                android:contentDescription="@string/logo_desc"
+                android:scaleType="fitCenter"
+                android:src="@drawable/logo_qr" />
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -48,9 +56,9 @@
             </LinearLayout>
 
             <ImageView
-                android:layout_width="84dp"
-                android:layout_height="84dp"
-                android:contentDescription="@string/logo_desc"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:contentDescription="@string/logo_rb_desc"
                 android:scaleType="fitCenter"
                 android:src="@drawable/logo_rb" />
         </LinearLayout>
@@ -132,6 +140,15 @@
                 android:text="@string/sender_start" />
 
             <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:text="@string/sender_discreet_hint"
+                android:textColor="@color/text_dim"
+                android:textSize="12sp" />
+
+            <TextView
                 android:id="@+id/senderStatus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -171,6 +188,33 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
+
+            <TextView
+                style="@style/Section"
+                android:layout_marginTop="26dp"
+                android:text="@string/direct_title" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/direct_steps"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/directIp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/neon_cyan"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/openHotspot"
+                style="@style/GhostButton"
+                android:text="@string/direct_open_settings" />
 
             <TextView
                 style="@style/Section"

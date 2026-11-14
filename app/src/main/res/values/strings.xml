@@ -3,7 +3,8 @@
     <string name="app_name">Quest3Replika</string>
     <string name="mode_title">Mode</string>
     <string name="tagline">Miroir VR · faible latence</string>
-    <string name="logo_desc">Logo RB</string>
+    <string name="logo_desc">Logo Quest3Replika</string>
+    <string name="logo_rb_desc">Logo RB</string>
     <string name="section_framing">Cadrage</string>
     <string name="section_quality">Qualité</string>
     <string name="section_network">Réseau local</string>
@@ -24,6 +25,14 @@
     <string name="receiver_searching">Recherche des émetteurs sur le réseau local…</string>
     <string name="receiver_found">Émetteurs trouvés (touchez pour vous connecter) :</string>
     <string name="receiver_auto">Se connecter automatiquement au premier émetteur trouvé</string>
+    <string name="receiver_stop_remote">Arrêter la diffusion du casque</string>
+    <string name="receiver_stop_sent">Arrêt demandé au casque…</string>
+    <string name="direct_title">Connexion directe (sans box)</string>
+    <string name="direct_steps">1. Activez le point d\'accès Wi-Fi de cette tablette.\n2. Dans le casque, connectez-vous à ce Wi-Fi (une seule fois : le Quest le retiendra).\n3. Lancez la diffusion : cette tablette trouvera le casque toute seule.</string>
+    <string name="direct_open_settings">Ouvrir les réglages du point d\'accès</string>
+    <string name="direct_ip">Adresse de cette tablette : %1$s</string>
+    <string name="direct_no_ip">Aucune adresse réseau pour l\'instant (Wi-Fi ou point d\'accès éteint).</string>
+    <string name="sender_discreet_hint">Après le démarrage, l\'application se ferme : lancez votre jeu, rien d\'autre ne s\'affiche dans le casque. La diffusion s\'arrête depuis la tablette.</string>
     <string name="receiver_manual_hint">Adresse IP manuelle (ex. 192.168.1.42)</string>
     <string name="receiver_manual_connect">Se connecter</string>
 
