@@ -13,7 +13,8 @@
     <string name="mode_receiver">Récepteur (tablette)</string>
 
     <string name="sender_crop">Recadrer sur l\'œil gauche</string>
-    <string name="sender_crop_hint">Supprime le double affichage côte à côte. L\'activation/désactivation redémarre l\'encodeur ; le zoom et le décalage s\'appliquent en direct.</string>
+    <string name="sender_fill">Remplir l\'écran de la tablette</string>
+    <string name="sender_crop_hint">Image toujours en paysage (16:9). « Remplir » : l\'image occupe toute la tablette, un peu coupée en haut et en bas. Sinon : image entière avec des bandes noires. « Recadrer sur l\'œil gauche » ne sert que si le casque envoie deux images côte à côte. Tous les réglages s\'appliquent en direct.</string>
     <string name="sender_zoom">Zoom</string>
     <string name="sender_offset_x">Décalage horizontal</string>
     <string name="sender_offset_y">Décalage vertical</string>

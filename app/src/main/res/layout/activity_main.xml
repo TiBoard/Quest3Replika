@@ -109,6 +109,17 @@
                 android:thumbTint="@color/neon_cyan"
                 android:trackTint="@color/neon_violet" />
 
+            <Switch
+                android:id="@+id/fillSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="@string/sender_fill"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:thumbTint="@color/neon_cyan"
+                android:trackTint="@color/neon_violet" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
