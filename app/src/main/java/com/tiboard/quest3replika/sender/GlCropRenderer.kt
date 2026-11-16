@@ -56,6 +56,7 @@ class GlCropRenderer(
 
     private val texMatrix = FloatArray(16)
     @Volatile private var crop = RectF(0f, 0f, 1f, 1f)
+    @Volatile private var dst = RectF(0f, 0f, 1f, 1f)
     private var lastDrawMs = 0L
     private var drawScheduled = false
     private var released = false
@@ -85,9 +86,13 @@ class GlCropRenderer(
         return inputSurface
     }
 
-    /** Zone source en fractions (origine en haut à gauche). Appliqué à l'image suivante. */
-    fun setCrop(rect: RectF) {
-        crop = RectF(rect)
+    /**
+     * Zone source et zone de destination, en fractions (origine en haut à gauche).
+     * La destination plus petite que la sortie donne des bandes noires. Appliqué à l'image suivante.
+     */
+    fun setFrame(src: RectF, destination: RectF) {
+        crop = RectF(src)
+        dst = RectF(destination)
         handler.post { scheduleDraw() }
     }
 
@@ -164,9 +169,14 @@ class GlCropRenderer(
         lastDrawMs = SystemClock.uptimeMillis()
         surfaceTexture.getTransformMatrix(texMatrix)
         val c = crop
+        val d = dst
         GLES20.glViewport(0, 0, outWidth, outHeight)
         GLES20.glClearColor(0f, 0f, 0f, 1f)
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+        GLES20.glViewport(
+            (d.left * outWidth).toInt(), ((1f - d.bottom) * outHeight).toInt(),
+            (d.width() * outWidth).toInt().coerceAtLeast(1), (d.height() * outHeight).toInt().coerceAtLeast(1),
+        )
         GLES20.glUseProgram(program)
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, texId)

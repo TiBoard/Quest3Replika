@@ -52,7 +52,7 @@ class CaptureService : Service(), StreamSender.Listener {
 
     private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
         when (key) {
-            Prefs.KEY_CROP, Prefs.KEY_ZOOM, Prefs.KEY_OFF_X, Prefs.KEY_OFF_Y -> capturer?.applyCropSettings()
+            Prefs.KEY_CROP, Prefs.KEY_FILL, Prefs.KEY_ZOOM, Prefs.KEY_OFF_X, Prefs.KEY_OFF_Y -> capturer?.applyCropSettings()
             Prefs.KEY_BITRATE -> capturer?.setBitrate(prefs.bitrateMbps)
         }
     }

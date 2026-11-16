@@ -46,19 +46,40 @@ class Prefs(context: Context) {
         get() = sp.getString(KEY_LAST_IP, "") ?: ""
         set(v) = sp.edit().putString(KEY_LAST_IP, v).apply()
 
+    /** true : l'image remplit la tablette en 16:9 (haut/bas coupés) ; false : image entière avec bandes noires. */
+    var fillMode: Boolean
+        get() = sp.getBoolean(KEY_FILL, true)
+        set(v) = sp.edit().putBoolean(KEY_FILL, v).apply()
+
+    /** Zone source (fractions de l'image capturée, origine en haut à gauche) et zone de destination dans la sortie. */
+    data class Frame(val src: RectF, val dst: RectF)
+
     /**
-     * Zone source à capturer, en fractions de l'image (origine en haut à gauche).
-     * Sans recadrage : image entière. Avec recadrage : moitié gauche (œil gauche du rendu
-     * stéréoscopique côte à côte), éventuellement zoomée et décalée.
+     * Calcule le cadrage de la vidéo de sortie, toujours en paysage ([outAspect], 16:9 par défaut).
+     *  - base : image entière, ou moitié gauche (œil gauche du rendu côte à côte) si le recadrage est activé ;
+     *  - zoom et décalages s'appliquent dans la base, sur toute sa course ;
+     *  - « remplir » : la fenêtre source prend le ratio de la sortie (on coupe en haut/bas ou sur les côtés) ;
+     *  - « tout voir » : la fenêtre garde son ratio et s'affiche centrée avec des bandes noires.
      */
-    fun cropRect(): RectF {
-        if (!cropEnabled) return RectF(0f, 0f, 1f, 1f)
+    fun frame(capW: Int, capH: Int, outAspect: Float): Frame {
+        val base = if (cropEnabled) RectF(0f, 0f, 0.5f, 1f) else RectF(0f, 0f, 1f, 1f)
         val z = cropZoom / 100f
-        val w = 0.5f / z
-        val h = 1f / z
-        val cx = 0.25f + (cropOffsetX / 100f) * (0.25f - w / 2f)
-        val cy = 0.5f + (cropOffsetY / 100f) * (0.5f - h / 2f)
-        return RectF(cx - w / 2f, cy - h / 2f, cx + w / 2f, cy + h / 2f)
+        var w = base.width() / z
+        var h = base.height() / z
+        var dst = RectF(0f, 0f, 1f, 1f)
+        val a = (w * capW) / (h * capH)
+        if (fillMode) {
+            if (a < outAspect) h = w * capW / (outAspect * capH) else w = h * capH * outAspect / capW
+        } else if (a >= outAspect) {
+            val dh = outAspect / a
+            dst = RectF(0f, (1f - dh) / 2f, 1f, (1f + dh) / 2f)
+        } else {
+            val dw = a / outAspect
+            dst = RectF((1f - dw) / 2f, 0f, (1f + dw) / 2f, 1f)
+        }
+        val cx = base.centerX() + (cropOffsetX / 100f) * (base.width() / 2f - w / 2f)
+        val cy = base.centerY() + (cropOffsetY / 100f) * (base.height() / 2f - h / 2f)
+        return Frame(RectF(cx - w / 2f, cy - h / 2f, cx + w / 2f, cy + h / 2f), dst)
     }
 
     companion object {
@@ -68,6 +89,7 @@ class Prefs(context: Context) {
         const val KEY_MODE = "mode"
         const val KEY_CROP = "crop_enabled"
         const val KEY_ZOOM = "crop_zoom"
+        const val KEY_FILL = "fill_mode"
         const val KEY_OFF_X = "crop_off_x"
         const val KEY_OFF_Y = "crop_off_y"
         const val KEY_BITRATE = "bitrate_mbps"

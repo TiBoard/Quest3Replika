@@ -118,6 +118,10 @@ class MainActivity : Activity() {
             updateCropLabels()
         }
 
+        val fill = findViewById<Switch>(R.id.fillSwitch)
+        fill.isChecked = prefs.fillMode
+        fill.setOnCheckedChangeListener { _, checked -> prefs.fillMode = checked }
+
         bindSeek(R.id.zoomSeek, prefs.cropZoom - 100) { prefs.cropZoom = it + 100 }
         bindSeek(R.id.offsetXSeek, prefs.cropOffsetX + 100) { prefs.cropOffsetX = it - 100 }
         bindSeek(R.id.offsetYSeek, prefs.cropOffsetY + 100) { prefs.cropOffsetY = it - 100 }
@@ -150,7 +154,7 @@ class MainActivity : Activity() {
     }
 
     private fun updateCropLabels() {
-        val enabled = prefs.cropEnabled
+        val enabled = true
         findViewById<TextView>(R.id.zoomLabel).text = "${getString(R.string.sender_zoom)} : ${prefs.cropZoom} %"
         findViewById<TextView>(R.id.offsetXLabel).text = "${getString(R.string.sender_offset_x)} : ${prefs.cropOffsetX}"
         findViewById<TextView>(R.id.offsetYLabel).text = "${getString(R.string.sender_offset_y)} : ${prefs.cropOffsetY}"

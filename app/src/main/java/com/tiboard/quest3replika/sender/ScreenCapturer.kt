@@ -1,7 +1,6 @@
 package com.tiboard.quest3replika.sender
 
 import android.content.Context
-import android.graphics.RectF
 import android.hardware.display.DisplayManager
 import android.hardware.display.VirtualDisplay
 import android.media.projection.MediaProjection
@@ -33,7 +32,6 @@ class ScreenCapturer(
     private var captureWidth = 0
     private var captureHeight = 0
     private var dpi = 320
-    private var currentCropEnabled = false
 
     var outputWidth = 0
         private set
@@ -73,9 +71,9 @@ class ScreenCapturer(
     }
 
     private fun startPipeline() {
-        val crop = prefs.cropRect()
-        currentCropEnabled = prefs.cropEnabled
-        val (ow, oh) = outputSizeFor(crop)
+        // Sortie toujours en paysage 16:9, quel que soit le format de l'image capturée.
+        val ow = MAX_W
+        val oh = MAX_H
         outputWidth = ow
         outputHeight = oh
         val enc = VideoEncoder(ow, oh, prefs.bitrateMbps * 1_000_000, Protocol.FPS, object : VideoEncoder.Callback {
@@ -86,7 +84,8 @@ class ScreenCapturer(
         enc.start()
         val r = GlCropRenderer(enc.inputSurface, ow, oh, captureWidth, captureHeight, Protocol.FPS)
         r.start()
-        r.setCrop(crop)
+        val f = prefs.frame(captureWidth, captureHeight, MAX_W.toFloat() / MAX_H)
+        r.setFrame(f.src, f.dst)
         encoder = enc
         renderer = r
     }
@@ -98,37 +97,10 @@ class ScreenCapturer(
         encoder = null
     }
 
-    /** Taille de sortie qui respecte le ratio de la zone recadrée, dans une boîte 1280x720. */
-    private fun outputSizeFor(crop: RectF): Pair<Int, Int> {
-        val aspect = (crop.width() * captureWidth) / (crop.height() * captureHeight)
-        var w: Float
-        var h: Float
-        if (aspect >= MAX_W.toFloat() / MAX_H) {
-            w = MAX_W.toFloat(); h = w / aspect
-        } else {
-            h = MAX_H.toFloat(); w = h * aspect
-        }
-        val ow = (w.toInt() / 16 * 16).coerceAtLeast(160)
-        val oh = (h.toInt() / 16 * 16).coerceAtLeast(160)
-        return ow to oh
-    }
-
-    /** Applique les réglages de recadrage. Zoom/décalage : en direct. Activation : reconstruction. */
+    /** Applique le cadrage (recadrage, zoom, décalages, remplir / tout voir) en direct, sans toucher à l'encodeur. */
     fun applyCropSettings() {
-        val r = renderer ?: return
-        if (prefs.cropEnabled != currentCropEnabled) {
-            Log.i(TAG, "Changement de recadrage : reconstruction de l'encodeur")
-            virtualDisplay?.surface = null
-            stopPipeline()
-            try {
-                startPipeline()
-                virtualDisplay?.surface = renderer!!.inputSurface
-            } catch (e: Exception) {
-                onError(e)
-            }
-        } else {
-            r.setCrop(prefs.cropRect())
-        }
+        val f = prefs.frame(captureWidth, captureHeight, MAX_W.toFloat() / MAX_H)
+        renderer?.setFrame(f.src, f.dst)
     }
 
     fun setBitrate(mbps: Int) = encoder?.setBitrate(mbps * 1_000_000)
