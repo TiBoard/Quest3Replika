@@ -13,7 +13,7 @@ class Prefs(context: Context) {
         set(v) = sp.edit().putString(KEY_MODE, v).apply()
 
     var cropEnabled: Boolean
-        get() = sp.getBoolean(KEY_CROP, true)
+        get() = sp.getBoolean(KEY_CROP, false)
         set(v) = sp.edit().putBoolean(KEY_CROP, v).apply()
 
     /** Zoom dans l'œil gauche, en pourcentage (100 = œil entier, 200 = moitié). */
