@@ -52,7 +52,7 @@ jobs:
         run: |
           mkdir -p dist
           VERSION=$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts)
-          cp app/build/outputs/apk/release/app-release.apk "dist/Quest3Replika-${VERSION}-${GITHUB_SHA::7}.apk"
+          cp app/build/outputs/apk/release/app-release.apk "dist/Quest3Replika-v${VERSION}.apk"
           ls -la dist
 
       # L'artefact est un bonus : le quota de stockage d'artefacts du compte peut être atteint,

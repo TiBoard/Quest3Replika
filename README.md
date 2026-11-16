@@ -62,7 +62,7 @@ adb devices
 # List of devices attached
 # 2G0YC1ZF8B0XXX    device      <- le Quest 3 doit apparaître comme "device"
 
-adb install -r Quest3Replika-1.0.0-xxxxxxx.apk
+adb install -r Quest3Replika-v1.1.0.apk
 # Success
 ```
 
@@ -215,11 +215,7 @@ cd Quest3Replika
 - `.github/workflows/build-apk.yml` compile l'APK à chaque push et pull request, et le publie dans les Releases (`latest` pour `main`, `pr-N` pour une PR, une release par tag `v*`). L'APK est aussi joint en artefact quand le quota de stockage du compte le permet.
 - `.github/workflows/screenshots.yml` lance l'application dans un émulateur Android et régénère les captures du README.
 
-Pour publier une version numérotée :
-
-```bash
-git tag v1.0.0 && git push origin v1.0.0
-```
+Le nom de l'APK se termine par la version (`Quest3Replika-v1.1.0.apk`), lue dans `versionName` de `app/build.gradle.kts`. Pour publier une nouvelle version : augmenter `versionName` et `versionCode` dans ce fichier, fusionner, puis créer la release `vX.Y.Z` (tag identique à `versionName`).
 
 Ou, sans ligne de commande : sur GitHub, *Releases → Draft a new release*, créez le tag `v1.0.0` sur `main` et publiez : le workflow joint l'APK à la release.
 
