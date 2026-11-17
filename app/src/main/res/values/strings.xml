@@ -29,8 +29,15 @@
     <string name="receiver_stop_remote">Arrêter la diffusion du casque</string>
     <string name="receiver_stop_sent">Arrêt demandé au casque…</string>
     <string name="direct_title">Connexion directe (sans box)</string>
-    <string name="direct_steps">1. Activez le point d\'accès Wi-Fi de cette tablette.\n2. Dans le casque, connectez-vous à ce Wi-Fi (une seule fois : le Quest le retiendra).\n3. Lancez la diffusion : cette tablette trouvera le casque toute seule.</string>
-    <string name="direct_open_settings">Ouvrir les réglages du point d\'accès</string>
+    <string name="direct_steps">1. Touchez « Créer le lien direct » ci-dessous (aucun point d\'accès ni box nécessaire).
+2. Dans le casque, ouvrez l\'application en mode Émetteur et touchez « Connexion directe à la tablette ».
+3. Acceptez l\'invitation qui s\'affiche sur la tablette (une seule fois).
+4. Lancez la diffusion : la tablette se connecte toute seule.</string>
+    <string name="direct_channel">Canal 5 GHz : %1$d (toucher pour changer)</string>
+    <string name="direct_create">Créer le lien direct (Wi-Fi Direct)</string>
+    <string name="direct_connect_headset">Connexion directe à la tablette</string>
+    <string name="direct_permission_denied">Autorisation refusée : le lien direct a besoin de l\'accès Wi-Fi à proximité.</string>
+    <string name="direct_open_settings">Autre option : point d\'accès Wi-Fi de la tablette</string>
     <string name="direct_ip">Adresse de cette tablette : %1$s</string>
     <string name="direct_no_ip">Aucune adresse réseau pour l\'instant (Wi-Fi ou point d\'accès éteint).</string>
     <string name="sender_discreet_hint">Après le démarrage, l\'application se ferme : lancez votre jeu, rien d\'autre ne s\'affiche dans le casque. La diffusion s\'arrête depuis la tablette.</string>

@@ -12,8 +12,8 @@ android {
         // Android 8.0 minimum pour les tablettes ; le Quest 3 tourne sous Android 12L/14 (Horizon OS).
         minSdk = 26
         targetSdk = 34
-        versionCode = 2
-        versionName = "1.1.0"
+        versionCode = 4
+        versionName = "1.2.1"
     }
 
     // Signature :

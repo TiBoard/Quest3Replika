@@ -146,6 +146,26 @@
             <SeekBar android:id="@+id/bitrateSeek" style="@style/Seek" android:max="8" />
 
             <Button
+                android:id="@+id/senderDirectButton"
+                style="@style/GhostButton"
+                android:text="@string/direct_connect_headset" />
+
+            <TextView
+                android:id="@+id/senderDirectStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:textColor="@color/neon_cyan"
+                android:textSize="12sp" />
+
+            <LinearLayout
+                android:id="@+id/senderDirectList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <Button
                 android:id="@+id/senderButton"
                 style="@style/NeonButton"
                 android:text="@string/sender_start" />
@@ -221,6 +241,23 @@
                 android:textColor="@color/neon_cyan"
                 android:textSize="13sp"
                 android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/directHostButton"
+                style="@style/NeonButton"
+                android:text="@string/direct_create" />
+
+            <TextView
+                android:id="@+id/directHostStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textColor="@color/neon_cyan"
+                android:textSize="13sp" />
+
+            <Button
+                android:id="@+id/directChannelButton"
+                style="@style/GhostButton" />
 
             <Button
                 android:id="@+id/openHotspot"
