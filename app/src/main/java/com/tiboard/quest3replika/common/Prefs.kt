@@ -42,6 +42,11 @@ class Prefs(context: Context) {
         get() = sp.getString(KEY_LAST_SENDER, null)
         set(v) = sp.edit().putString(KEY_LAST_SENDER, v).apply()
 
+    /** Nom Wi-Fi Direct de la tablette choisie la dernière fois (le casque la retrouve en priorité). */
+    var lastDirectName: String?
+        get() = sp.getString("last_direct_name", null)
+        set(v) = sp.edit().putString("last_direct_name", v).apply()
+
     var lastManualIp: String
         get() = sp.getString(KEY_LAST_IP, "") ?: ""
         set(v) = sp.edit().putString(KEY_LAST_IP, v).apply()

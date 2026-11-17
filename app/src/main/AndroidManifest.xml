@@ -17,11 +17,16 @@
         tools:targetApi="33" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- Liaison directe Wi-Fi Direct (sans box) : localisation seulement avant Android 13. -->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="32" />
+
     <!-- Service au premier plan de type mediaProjection (obligatoire Android 14+). -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
 
     <uses-feature android:name="android.hardware.wifi" android:required="false" />
+    <uses-feature android:name="android.hardware.wifi.direct" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
 
     <application

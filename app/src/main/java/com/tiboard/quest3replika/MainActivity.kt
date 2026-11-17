@@ -22,6 +22,7 @@ import com.tiboard.quest3replika.common.Prefs
 import com.tiboard.quest3replika.common.Protocol
 import com.tiboard.quest3replika.discovery.BeaconListener
 import com.tiboard.quest3replika.discovery.NsdScanner
+import com.tiboard.quest3replika.discovery.WifiDirect
 import com.tiboard.quest3replika.receiver.ReceiverActivity
 import com.tiboard.quest3replika.sender.CaptureService
 
@@ -63,6 +64,7 @@ class MainActivity : Activity() {
             applyMode()
         }
 
+        setupDirectControls()
         setupSenderControls()
         setupReceiverControls()
         // Aucune demande de permission ici : le casque ne doit afficher aucune fenêtre superflue.
@@ -91,12 +93,15 @@ class MainActivity : Activity() {
     override fun onResume() {
         super.onResume()
         CaptureService.statusListener = { text -> runOnUiThread { renderSenderState(text) } }
+        WifiDirect.listener = { text -> runOnUiThread { renderDirect(text) } }
+        renderDirect(WifiDirect.status)
         renderSenderState(CaptureService.status)
         applyMode()
     }
 
     override fun onPause() {
         CaptureService.statusListener = null
+        WifiDirect.listener = null
         stopScanning()
         super.onPause()
     }
@@ -106,6 +111,45 @@ class MainActivity : Activity() {
         senderPanel.visibility = if (sender) View.VISIBLE else View.GONE
         receiverPanel.visibility = if (sender) View.GONE else View.VISIBLE
         if (sender) stopScanning() else startScanning()
+    }
+
+    // ---------------- Liaison directe Wi-Fi Direct ----------------
+
+    private var pendingDirect: Runnable? = null
+
+    private fun setupDirectControls() {
+        WifiDirect.onPeerChosen = { name -> prefs.lastDirectName = name }
+        findViewById<Button>(R.id.senderDirectButton).setOnClickListener {
+            withDirectPermission { WifiDirect.startClient(this, prefs.lastDirectName) }
+        }
+        findViewById<Button>(R.id.directHostButton).setOnClickListener {
+            withDirectPermission { WifiDirect.startHost(this) }
+        }
+    }
+
+    private fun withDirectPermission(action: Runnable) {
+        if (WifiDirect.hasPermission(this)) {
+            action.run()
+        } else {
+            pendingDirect = action
+            WifiDirect.requestPermission(this, REQ_DIRECT)
+        }
+    }
+
+    @Deprecated("API Activity historique, suffisante ici (aucune dépendance AndroidX)")
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        @Suppress("DEPRECATION")
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode != REQ_DIRECT) return
+        val action = pendingDirect
+        pendingDirect = null
+        if (grantResults.firstOrNull() == android.content.pm.PackageManager.PERMISSION_GRANTED) action?.run()
+        else Toast.makeText(this, R.string.direct_permission_denied, Toast.LENGTH_LONG).show()
+    }
+
+    private fun renderDirect(text: String?) {
+        findViewById<TextView>(R.id.senderDirectStatus).text = text ?: ""
+        findViewById<TextView>(R.id.directHostStatus).text = text ?: ""
     }
 
     // ---------------- Émetteur ----------------
@@ -281,6 +325,7 @@ class MainActivity : Activity() {
 
     companion object {
         private const val REQ_PROJECTION = 2001
+        private const val REQ_DIRECT = 2002
         const val EXTRA_AUTOSTART = "autostart"
     }
 }

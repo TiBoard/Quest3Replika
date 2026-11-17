@@ -41,6 +41,7 @@ object Beacon {
                 if (d.ipAddress != 0 && d.netmask != 0) out += fromLittleEndian((d.ipAddress and d.netmask) or d.netmask.inv())
             }
             out += InetAddress.getByName("255.255.255.255")
+            out += WifiDirect.broadcastTargets()
         } catch (e: Exception) {
             Log.w(TAG, "targets", e)
         }

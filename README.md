@@ -81,11 +81,26 @@ Au choix :
 
 ## 5. Connexion directe, sans box
 
-Le casque peut se connecter **directement au Wi-Fi de la tablette** : aucun routeur, aucune box, aucun Internet.
+Le casque peut se connecter **directement à la tablette** : aucun routeur, aucune box, aucun Internet. Deux méthodes, au choix.
 
-1. **Sur la tablette** : activez le **point d'accès Wi-Fi** (Paramètres → Connexions → Point d'accès mobile). Choisissez la bande **5 GHz** si la tablette le propose : c'est plus fluide. Notez le nom du réseau et le mot de passe. Dans Quest3Replika (mode Récepteur), le bouton **« Ouvrir les réglages du point d'accès »** y mène directement.
-2. **Dans le casque** : *Paramètres → Wi-Fi* → choisissez le réseau de la tablette et entrez le mot de passe. Le casque affiche peut-être « Pas d'Internet » : c'est normal, la diffusion n'en a pas besoin. Cette étape n'est à faire **qu'une fois** : le Quest retient le réseau.
-3. Lancez la diffusion (étape suivante) : la tablette **trouve le casque toute seule**. Le casque envoie une petite balise à la tablette (qui est la passerelle du réseau), sans dépendre du mDNS que beaucoup de points d'accès mobiles bloquent.
+### Méthode A (recommandée) : lien direct Wi-Fi Direct, intégré à l'appli
+
+Fonctionne même sur les tablettes sans point d'accès Wi-Fi (par exemple Samsung Galaxy Tab S8 Wi-Fi).
+
+1. **Sur la tablette** (mode Récepteur) : touchez **« Créer le lien direct (Wi-Fi Direct) »**. Acceptez l'autorisation « Appareils Wi-Fi à proximité ».
+2. **Dans le casque** (mode Émetteur) : touchez **« Connexion directe à la tablette »** (autorisation à accepter une seule fois). Le casque trouve la tablette et se connecte.
+3. **Sur la tablette** : une invitation de connexion s'affiche, **acceptez-la** (au premier lien seulement).
+4. Le casque affiche « Connecté à la tablette en lien direct » : lancez la diffusion (étape suivante). Le lien reste actif quand l'appli se ferme (mode discret).
+
+Pendant la diffusion, le casque peut perdre son accès Internet habituel si Android le décide : ce n'est pas nécessaire à la diffusion.
+
+### Méthode B : point d'accès Wi-Fi de la tablette
+
+Si votre tablette propose un point d'accès mobile :
+
+1. **Sur la tablette** : activez le **point d'accès Wi-Fi** (Paramètres → Connexions → Point d'accès mobile), de préférence en **5 GHz**.
+2. **Dans le casque** : *Paramètres → Wi-Fi* → choisissez le réseau de la tablette (une seule fois : le Quest le retient). « Pas d'Internet » est normal.
+3. Lancez la diffusion : la tablette **trouve le casque toute seule** grâce à une petite balise (sans mDNS).
 
 <p align="center"><img src="docs/screenshots/05b-connexion-directe.png" width="80%" alt="Carte « Connexion directe » du mode Récepteur" /></p>
 
@@ -229,7 +244,8 @@ Le dépôt contient un keystore de debug (`keystore/debug.keystore`, mot de pass
 |---|---|
 | `FOREGROUND_SERVICE` + `FOREGROUND_SERVICE_MEDIA_PROJECTION` | Service de capture qui tourne en arrière-plan (obligatoire depuis Android 14) |
 | `POST_NOTIFICATIONS` (déclarée mais **jamais demandée**) | Notification du service de capture ; sans l'autorisation, elle reste invisible, ce qui garde le casque propre |
-| `NEARBY_WIFI_DEVICES` (`neverForLocation`, Android 13+) | Wi-Fi local, sans accès à la localisation (aucune fenêtre de demande) |
+| `NEARBY_WIFI_DEVICES` (`neverForLocation`, Android 13+) | Wi-Fi local et lien direct, sans accès à la localisation (demandée une seule fois, au premier lien direct) |
+| `CHANGE_WIFI_STATE`, `ACCESS_FINE_LOCATION` (jusqu'à Android 12 seulement) | Lien direct Wi-Fi Direct ; avant Android 13, Android impose l'autorisation de localisation pour chercher des appareils Wi-Fi |
 | `CHANGE_WIFI_MULTICAST_STATE` | Réception des annonces mDNS |
 | `INTERNET`, `ACCESS_NETWORK_STATE`, `ACCESS_WIFI_STATE` | Sockets TCP en réseau local (aucun accès Internet utilisé) |
 | `WAKE_LOCK` | Empêcher la mise en veille du CPU / Wi-Fi pendant la diffusion |
