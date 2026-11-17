@@ -62,7 +62,7 @@ adb devices
 # List of devices attached
 # 2G0YC1ZF8B0XXX    device      <- le Quest 3 doit apparaître comme "device"
 
-adb install -r Quest3Replika-v1.2.0.apk
+adb install -r Quest3Replika-v1.2.1.apk
 # Success
 ```
 
@@ -91,6 +91,8 @@ Fonctionne même sur les tablettes sans point d'accès Wi-Fi (par exemple Samsun
 2. **Dans le casque** (mode Émetteur) : touchez **« Connexion directe à la tablette »** (autorisation à accepter une seule fois). Le casque trouve la tablette et se connecte.
 3. **Sur la tablette** : une invitation de connexion s'affiche, **acceptez-la** (au premier lien seulement).
 4. Le casque affiche « Connecté à la tablette en lien direct » : lancez la diffusion (étape suivante). Le lien reste actif quand l'appli se ferme (mode discret).
+
+**Plusieurs paires casque/tablette en même temps** : chaque tablette utilise son propre canal 5 GHz (bouton « Canal 5 GHz » sous « Créer le lien direct » : si deux tablettes affichent le même numéro, touchez-le sur l'une d'elles). Si le casque voit plusieurs tablettes, il vous demande laquelle utiliser, puis s'en souvient.
 
 Pendant la diffusion, le casque peut perdre son accès Internet habituel si Android le décide : ce n'est pas nécessaire à la diffusion.
 
@@ -230,7 +232,7 @@ cd Quest3Replika
 - `.github/workflows/build-apk.yml` compile l'APK à chaque push et pull request, et le publie dans les Releases (`latest` pour `main`, `pr-N` pour une PR, une release par tag `v*`). L'APK est aussi joint en artefact quand le quota de stockage du compte le permet.
 - `.github/workflows/screenshots.yml` lance l'application dans un émulateur Android et régénère les captures du README.
 
-Le nom de l'APK se termine par la version (`Quest3Replika-v1.2.0.apk`), lue dans `versionName` de `app/build.gradle.kts`. Pour publier une nouvelle version : augmenter `versionName` et `versionCode` dans ce fichier, fusionner, puis créer la release `vX.Y.Z` (tag identique à `versionName`).
+Le nom de l'APK se termine par la version (`Quest3Replika-v1.2.1.apk`), lue dans `versionName` de `app/build.gradle.kts`. Pour publier une nouvelle version : augmenter `versionName` et `versionCode` dans ce fichier, fusionner, puis créer la release `vX.Y.Z` (tag identique à `versionName`).
 
 Ou, sans ligne de commande : sur GitHub, *Releases → Draft a new release*, créez le tag `v1.0.0` sur `main` et publiez : le workflow joint l'APK à la release.
 

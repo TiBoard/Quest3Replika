@@ -32,12 +32,19 @@ object WifiDirect {
     private var appContext: Context? = null
     private var host = false
     private var connecting = false
-    private var preferredName: String? = null
 
     @Volatile var status: String? = null
         private set
     var listener: ((String) -> Unit)? = null
-    var onPeerChosen: ((String) -> Unit)? = null
+    /** Appelé avec (nom, adresse) de la tablette choisie, pour s'en souvenir. */
+    var onPeerChosen: ((String, String) -> Unit)? = null
+    /** Appelé quand plusieurs tablettes sont visibles et qu'aucune n'est mémorisée : l'utilisateur choisit. */
+    var onPeers: ((List<WifiP2pDevice>) -> Unit)? = null
+    private var preferredAddress: String? = null
+
+    /** Fréquences (MHz) des canaux 5 GHz sans radar : 36, 40, 44, 48. */
+    val CHANNELS = intArrayOf(5180, 5200, 5220, 5240)
+    val CHANNEL_NUMBERS = intArrayOf(36, 40, 44, 48)
 
     fun isSupported(context: Context): Boolean =
         context.packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI_DIRECT)
@@ -81,14 +88,14 @@ object WifiDirect {
     // ---------------- Tablette : crée le groupe ----------------
 
     @SuppressLint("MissingPermission")
-    fun startHost(context: Context) {
+    fun startHost(context: Context, channelIndex: Int = 0) {
         if (!isSupported(context)) return say("Wi-Fi Direct non disponible sur cet appareil.")
         if (!init(context)) return say("Wi-Fi Direct indisponible.")
         host = true
         val m = manager!!
         val ch = channel!!
         say("Création du lien direct…")
-        val create = {
+        val plain = {
             m.createGroup(ch, object : WifiP2pManager.ActionListener {
                 override fun onSuccess() = refreshGroup()
                 override fun onFailure(reason: Int) {
@@ -96,6 +103,28 @@ object WifiDirect {
                     if (reason == WifiP2pManager.BUSY) refreshGroup() else say("Échec du lien direct (code $reason). Activez le Wi-Fi et réessayez.")
                 }
             })
+        }
+        // Canal 5 GHz propre à cette tablette : deux liens dans la même pièce ne se gênent plus.
+        val create = {
+            if (Build.VERSION.SDK_INT >= 29) {
+                try {
+                    val chars = "abcdefghjkmnpqrstuvwxyz23456789"
+                    val pass = (1..12).map { chars.random() }.joinToString("")
+                    val cfg = WifiP2pConfig.Builder()
+                        .setNetworkName("DIRECT-QR-" + (1..4).map { chars.random() }.joinToString(""))
+                        .setPassphrase(pass)
+                        .setGroupOperatingFrequency(CHANNELS[channelIndex.coerceIn(0, 3)])
+                        .build()
+                    m.createGroup(ch, cfg, object : WifiP2pManager.ActionListener {
+                        override fun onSuccess() = refreshGroup()
+                        override fun onFailure(reason: Int) { plain() }
+                    })
+                } catch (e: Exception) {
+                    plain()
+                }
+            } else {
+                plain()
+            }
         }
         m.removeGroup(ch, object : WifiP2pManager.ActionListener {
             override fun onSuccess() = create()
@@ -123,12 +152,12 @@ object WifiDirect {
     // ---------------- Casque : rejoint le groupe ----------------
 
     @SuppressLint("MissingPermission")
-    fun startClient(context: Context, preferred: String?) {
+    fun startClient(context: Context, preferredAddress: String?) {
         if (!isSupported(context)) return say("Wi-Fi Direct non disponible sur cet appareil.")
         if (!init(context)) return say("Wi-Fi Direct indisponible.")
         host = false
         connecting = false
-        preferredName = preferred
+        this.preferredAddress = preferredAddress
         say("Recherche de la tablette…")
         manager!!.discoverPeers(channel!!, object : WifiP2pManager.ActionListener {
             override fun onSuccess() {}
@@ -162,9 +191,21 @@ object WifiDirect {
 
     @SuppressLint("MissingPermission")
     private fun choosePeer(devices: List<WifiP2pDevice>) {
-        val dev = devices.firstOrNull { it.deviceName == preferredName && it.isGroupOwner }
-            ?: devices.firstOrNull { it.isGroupOwner }
-            ?: return
+        val owners = devices.filter { it.isGroupOwner }
+        if (owners.isEmpty()) return
+        val dev = owners.firstOrNull { it.deviceAddress == preferredAddress }
+            ?: owners.singleOrNull()
+        if (dev == null) {
+            say("Plusieurs tablettes trouvées : touchez celle à utiliser.")
+            onPeers?.invoke(owners)
+            return
+        }
+        connectTo(dev)
+    }
+
+    /** Se connecte à la tablette choisie. */
+    @SuppressLint("MissingPermission")
+    fun connectTo(dev: WifiP2pDevice) {
         connecting = true
         say("Connexion à « ${dev.deviceName} »… (acceptez l'invitation sur la tablette)")
         val cfg = WifiP2pConfig().apply {
@@ -179,7 +220,7 @@ object WifiDirect {
                 say("Connexion refusée (code $reason). Réessayez.")
             }
         })
-        onPeerChosen?.invoke(dev.deviceName)
+        onPeerChosen?.invoke(dev.deviceName, dev.deviceAddress)
     }
 
     /** Arrête la recherche ; le lien déjà établi reste actif. */

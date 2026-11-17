@@ -43,9 +43,17 @@ class Prefs(context: Context) {
         set(v) = sp.edit().putString(KEY_LAST_SENDER, v).apply()
 
     /** Nom Wi-Fi Direct de la tablette choisie la dernière fois (le casque la retrouve en priorité). */
-    var lastDirectName: String?
-        get() = sp.getString("last_direct_name", null)
-        set(v) = sp.edit().putString("last_direct_name", v).apply()
+    var lastDirectAddress: String?
+        get() = sp.getString("last_direct_address", null)
+        set(v) = sp.edit().putString("last_direct_address", v).apply()
+
+    /** Canal 5 GHz du lien direct de cette tablette (0..3 = canaux 36, 40, 44, 48). Choisi au hasard une fois. */
+    var directChannel: Int
+        get() {
+            if (!sp.contains("direct_channel")) sp.edit().putInt("direct_channel", (0..3).random()).apply()
+            return sp.getInt("direct_channel", 0).coerceIn(0, 3)
+        }
+        set(v) = sp.edit().putInt("direct_channel", v.coerceIn(0, 3)).apply()
 
     var lastManualIp: String
         get() = sp.getString(KEY_LAST_IP, "") ?: ""

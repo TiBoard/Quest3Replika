@@ -118,12 +118,19 @@ class MainActivity : Activity() {
     private var pendingDirect: Runnable? = null
 
     private fun setupDirectControls() {
-        WifiDirect.onPeerChosen = { name -> prefs.lastDirectName = name }
+        WifiDirect.onPeerChosen = { _, address -> prefs.lastDirectAddress = address }
+        WifiDirect.onPeers = { list -> runOnUiThread { renderDirectPeers(list) } }
+        updateChannelButton()
+        findViewById<Button>(R.id.directChannelButton).setOnClickListener {
+            prefs.directChannel = (prefs.directChannel + 1) % 4
+            updateChannelButton()
+            withDirectPermission { WifiDirect.startHost(this, prefs.directChannel) }
+        }
         findViewById<Button>(R.id.senderDirectButton).setOnClickListener {
-            withDirectPermission { WifiDirect.startClient(this, prefs.lastDirectName) }
+            withDirectPermission { WifiDirect.startClient(this, prefs.lastDirectAddress) }
         }
         findViewById<Button>(R.id.directHostButton).setOnClickListener {
-            withDirectPermission { WifiDirect.startHost(this) }
+            withDirectPermission { WifiDirect.startHost(this, prefs.directChannel) }
         }
     }
 
@@ -145,6 +152,28 @@ class MainActivity : Activity() {
         pendingDirect = null
         if (grantResults.firstOrNull() == android.content.pm.PackageManager.PERMISSION_GRANTED) action?.run()
         else Toast.makeText(this, R.string.direct_permission_denied, Toast.LENGTH_LONG).show()
+    }
+
+    private fun updateChannelButton() {
+        findViewById<Button>(R.id.directChannelButton).text =
+            getString(R.string.direct_channel, WifiDirect.CHANNEL_NUMBERS[prefs.directChannel])
+    }
+
+    private fun renderDirectPeers(list: List<android.net.wifi.p2p.WifiP2pDevice>) {
+        val box = findViewById<LinearLayout>(R.id.senderDirectList)
+        box.removeAllViews()
+        for (d in list) {
+            val b = Button(ContextThemeWrapper(this, R.style.GhostButton), null, 0)
+            b.setBackgroundResource(R.drawable.btn_ghost)
+            b.setTextColor(getColor(R.color.text_primary))
+            b.isAllCaps = false
+            b.text = "${d.deviceName} (${d.deviceAddress.takeLast(5)})"
+            b.setOnClickListener {
+                box.removeAllViews()
+                WifiDirect.connectTo(d)
+            }
+            box.addView(b)
+        }
     }
 
     private fun renderDirect(text: String?) {

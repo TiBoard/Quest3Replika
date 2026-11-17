@@ -33,6 +33,7 @@
 2. Dans le casque, ouvrez l\'application en mode Émetteur et touchez « Connexion directe à la tablette ».
 3. Acceptez l\'invitation qui s\'affiche sur la tablette (une seule fois).
 4. Lancez la diffusion : la tablette se connecte toute seule.</string>
+    <string name="direct_channel">Canal 5 GHz : %1$d (toucher pour changer)</string>
     <string name="direct_create">Créer le lien direct (Wi-Fi Direct)</string>
     <string name="direct_connect_headset">Connexion directe à la tablette</string>
     <string name="direct_permission_denied">Autorisation refusée : le lien direct a besoin de l\'accès Wi-Fi à proximité.</string>
